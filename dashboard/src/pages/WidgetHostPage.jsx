@@ -377,13 +377,13 @@ function TopModelsWidgetHost() {
             const pct = Number(model?.percent || 0);
             return (
               <div key={model.id || model.name} className="space-y-[5px]">
-                <div className="grid grid-cols-[minmax(0,1fr)_42px_28px] items-center gap-[7px] text-[9px] leading-none">
-                  <div className="flex min-w-0 items-center gap-[6px]">
+                <div className="grid grid-cols-[minmax(0,1fr)_42px_28px] items-center gap-[7px] text-[9px] leading-[1.2]">
+                  <div className="flex min-w-0 items-center gap-[6px] py-[1px]">
                   <span
                     className="h-[5px] w-[5px] rounded-full shrink-0"
                     style={{ background: color }}
                   />
-                  <span className="min-w-0 truncate font-semibold text-white/88">
+                  <span className="min-w-0 truncate font-semibold text-white/88 leading-[1.2]">
                     {middleEllipsis(model.name, 24)}
                   </span>
                   </div>
@@ -418,38 +418,36 @@ function LimitsWidgetHost() {
   const [rows, setRows] = useState([]);
 
   const buildLimitRows = (res) => {
-    const specs = [
-      {
-        label: "Codex · 5h",
-        source: "codex",
-        pct: Number(res?.codex?.primary_window?.used_percent || 0),
-        reset: formatLimitReset(res?.codex?.primary_window?.reset_at),
-      },
-      {
-        label: "Codex · 7d",
-        source: "codex",
-        pct: Number(res?.codex?.secondary_window?.used_percent || 0),
-        reset: formatLimitReset(res?.codex?.secondary_window?.reset_at),
-      },
-      {
-        label: "Claude · 5h",
-        source: "claude",
-        pct: Number(res?.claude?.five_hour?.utilization || 0),
-        reset: formatLimitReset(res?.claude?.five_hour?.resets_at),
-      },
-      {
-        label: "Claude · 7d",
-        source: "claude",
-        pct: Number(res?.claude?.seven_day?.utilization || 0),
-        reset: formatLimitReset(res?.claude?.seven_day?.resets_at),
-      },
-    ];
+    const nextRows = [];
+    const pushRow = (label, source, pct, reset) => {
+      if (!Number.isFinite(Number(pct))) return;
+      nextRows.push({
+        label,
+        source,
+        pct: Number(pct),
+        reset: reset || "",
+      });
+    };
 
-    return specs.map((row) => ({
-      ...row,
-      pct: Number.isFinite(row.pct) ? row.pct : 0,
-      reset: row.reset || "",
-    }));
+    if (res?.claude?.five_hour) pushRow("Claude · 5h", "claude", res.claude.five_hour.utilization, formatLimitReset(res.claude.five_hour.resets_at));
+    if (res?.claude?.seven_day) pushRow("Claude · 7d", "claude", res.claude.seven_day.utilization, formatLimitReset(res.claude.seven_day.resets_at));
+    if (res?.claude?.seven_day_opus) pushRow("Claude · Opus", "claude", res.claude.seven_day_opus.utilization, formatLimitReset(res.claude.seven_day_opus.resets_at));
+
+    if (res?.codex?.primary_window) pushRow("Codex · 5h", "codex", res.codex.primary_window.used_percent, formatLimitReset(res.codex.primary_window.reset_at));
+    if (res?.codex?.secondary_window) pushRow("Codex · 7d", "codex", res.codex.secondary_window.used_percent, formatLimitReset(res.codex.secondary_window.reset_at));
+
+    if (res?.cursor?.primary_window) pushRow("Cursor", "cursor", res.cursor.primary_window.used_percent, formatLimitReset(res.cursor.primary_window.reset_at));
+    if (res?.cursor?.secondary_window) pushRow("Cursor Auto", "cursor", res.cursor.secondary_window.used_percent, formatLimitReset(res.cursor.secondary_window.reset_at));
+    if (res?.cursor?.tertiary_window) pushRow("Cursor API", "cursor", res.cursor.tertiary_window.used_percent, formatLimitReset(res.cursor.tertiary_window.reset_at));
+
+    if (res?.gemini?.primary_window) pushRow("Gemini", "gemini", res.gemini.primary_window.used_percent, formatLimitReset(res.gemini.primary_window.reset_at));
+    if (res?.gemini?.secondary_window) pushRow("Gemini Flash", "gemini", res.gemini.secondary_window.used_percent, formatLimitReset(res.gemini.secondary_window.reset_at));
+    if (res?.gemini?.tertiary_window) pushRow("Gemini Lite", "gemini", res.gemini.tertiary_window.used_percent, formatLimitReset(res.gemini.tertiary_window.reset_at));
+
+    if (res?.copilot?.primary_window) pushRow("Copilot", "cursor", res.copilot.primary_window.used_percent, formatLimitReset(res.copilot.primary_window.reset_at));
+    if (res?.copilot?.secondary_window) pushRow("Copilot Chat", "cursor", res.copilot.secondary_window.used_percent, formatLimitReset(res.copilot.secondary_window.reset_at));
+
+    return nextRows.slice(0, 4);
   };
 
   useWidgetClock(
