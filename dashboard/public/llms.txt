@@ -1,0 +1,22 @@
+# Token Tracker LLMs Index
+
+Token Tracker tracks token usage across AI coding agent clients (Claude Code, Codex, Cursor, Kiro, Gemini, OpenCode, OpenClaw, Every Code).
+
+## Canonical URL
+- [Homepage](https://github.com/Aniian709/TokenUsage)
+
+## Priority URLs
+- [Homepage](https://github.com/Aniian709/TokenUsage)
+- [Repository](https://github.com/Aniian709/TokenUsage)
+
+## Product
+- Install command: `npx tokentracker-cli`
+- [NPM package](https://www.npmjs.com/package/tokentracker-cli)
+- [Source repository](https://github.com/Aniian709/TokenUsage)
+
+## Policy and Discovery
+- [llms.txt](https://github.com/Aniian709/TokenUsage/blob/main/dashboard/public/llms.txt)
+- Data principle: token counts only, never prompts or conversation content.
+
+## Contact
+- [GitHub issues](https://github.com/Aniian709/TokenUsage/issues)

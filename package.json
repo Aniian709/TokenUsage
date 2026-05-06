@@ -1,0 +1,58 @@
+{
+  "name": "tokenusage",
+  "version": "0.6.2",
+  "description": "Local token usage dashboard for Codex and Claude Code on Windows, with desktop widgets and persisted history.",
+  "main": "src/cli.js",
+  "bin": {
+    "tokentracker-cli": "bin/tracker.js",
+    "tracker": "bin/tracker.js",
+    "tokentracker": "bin/tracker.js",
+    "tokentracker-tracker": "bin/tracker.js"
+  },
+  "files": [
+    "bin/",
+    "src/",
+    "dashboard/dist/",
+    "LICENSE",
+    "README.md"
+  ],
+  "type": "commonjs",
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "start": "node bin/tracker.js serve",
+    "dashboard:build": "npm --prefix dashboard run build",
+    "dashboard:dev": "npm --prefix dashboard run dev"
+  },
+  "devDependencies": {
+    "@sourcegraph/scip-typescript": "^0.3.6",
+    "electron": "^41.5.0",
+    "esbuild": "0.27.2"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Aniian709/TokenUsage.git"
+  },
+  "homepage": "https://github.com/Aniian709/TokenUsage",
+  "bugs": {
+    "url": "https://github.com/Aniian709/TokenUsage/issues"
+  },
+  "keywords": [
+    "token",
+    "tracker",
+    "ai",
+    "claude",
+    "codex",
+    "cursor",
+    "gemini",
+    "kiro",
+    "opencode",
+    "usage",
+    "cost"
+  ],
+  "license": "MIT",
+  "engines": {
+    "node": ">=20"
+  }
+}
