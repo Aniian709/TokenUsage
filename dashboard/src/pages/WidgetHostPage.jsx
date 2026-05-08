@@ -14,6 +14,8 @@ import {
 } from "../lib/api";
 import { getOverlayConfig } from "../lib/widget-overlays";
 import { buildTopModels } from "../lib/model-breakdown";
+import { ClawdAnimated } from "../ui/foundation/ClawdAnimated.jsx";
+import { useClawdState } from "../hooks/useClawdState.js";
 
 const MODEL_COLORS = ["#5A8CF2", "#9973E6", "#4DB8A6", "#E68C59"];
 const SOURCE_COLORS = {
@@ -156,7 +158,7 @@ function useOverlayAppearance() {
 }
 
 function widgetSurfaceStyle(kind, opacity) {
-  const clamped = Number.isFinite(opacity) ? Math.max(0.18, Math.min(1, opacity)) : 1;
+  const clamped = Number.isFinite(opacity) ? Math.max(0.09, Math.min(1, opacity)) : 1;
   if (kind === "menubar") {
     return {
       border: `1px solid rgba(255,255,255,${0.1 * clamped + 0.04})`,
@@ -564,22 +566,33 @@ function MenuBarWidgetHost() {
   const displayItems = Array.isArray(menuBar.items) && menuBar.items.length > 0
     ? menuBar.items.slice(0, 2)
     : ["todayTokens", "todayCost"];
+  const clawdState = useClawdState({
+    todayTokens: Number(summary.today?.billable_total_tokens ?? summary.today?.total_tokens ?? 0),
+    isSyncing: false,
+    hasError: false,
+    isDisconnected: false,
+  });
 
   return (
     <WidgetShell kind="menubar" appearanceOpacity={appearance.opacity}>
       <div className="flex h-full items-center justify-center px-[6px] text-white">
         <div className="inline-flex items-stretch">
           <div className="flex items-center pl-[2px] pr-[9px]">
-            <img
-              src="/clawd/mini/idle-tight.svg"
-              alt=""
-              className="block h-[25px] w-auto shrink-0"
-              draggable="false"
-              style={{
-                opacity: menuBar.animatedIcon ? 1 : 0.92,
-                transform: menuBar.animatedIcon ? "translateY(-0.5px)" : "none",
-              }}
-            />
+            {menuBar.animatedIcon ? (
+              <ClawdAnimated
+                state={clawdState}
+                size={52}
+                className="shrink-0"
+              />
+            ) : (
+              <img
+                src="/clawd/mini/idle-tight.svg"
+                alt=""
+                className="block h-[50px] w-auto shrink-0"
+                draggable="false"
+                style={{ opacity: 0.92 }}
+              />
+            )}
           </div>
           {menuBar.showStats ? (
             <div className="inline-flex items-stretch">

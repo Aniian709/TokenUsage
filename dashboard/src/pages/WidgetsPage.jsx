@@ -772,9 +772,9 @@ function DesktopOverlayCard({ config, saving, onSaveOverlayConfig }) {
             </span>
             <input
               type="range"
-              min="0.65"
+              min="0.325"
               max="1"
-              step="0.05"
+              step="0.025"
               value={config?.appearance?.opacity ?? 1}
               disabled={!config || saving}
               onChange={(event) => setAppearance({ opacity: Number(event.target.value) })}

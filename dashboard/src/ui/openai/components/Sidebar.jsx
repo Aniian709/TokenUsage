@@ -159,12 +159,12 @@ function LocalIdentity({ collapsed }) {
     <Link
       to="/dashboard"
       className="flex w-full items-center gap-3 rounded-md border border-oai-gray-200 dark:border-oai-gray-800 bg-oai-gray-100/70 dark:bg-oai-gray-900/70 px-3 py-2 no-underline transition-colors hover:bg-oai-gray-200/70 dark:hover:bg-oai-gray-800/70"
-      aria-label="TokenTracker Local"
+      aria-label="TokenUsage Local"
     >
       <img src="/app-icon.png" alt="" width={28} height={28} className="h-7 w-7 rounded-md shrink-0" />
       <div className="min-w-0">
         <div className="truncate text-[13px] font-medium text-oai-black dark:text-white">
-          TokenTracker
+          TokenUsage
         </div>
         <div className="truncate text-[11px] text-oai-gray-500 dark:text-oai-gray-500">
           Local Dashboard
@@ -500,11 +500,11 @@ function MobileTopBar({ onOpenDrawer }) {
       <Link
         to="/dashboard"
         className="flex items-center gap-2 no-underline hover:opacity-80 transition-opacity"
-        aria-label="Token Tracker"
+        aria-label="TokenUsage"
       >
         <img src="/app-icon.png" alt="" width={24} height={24} className="rounded-md" />
         <span className="text-sm font-semibold text-oai-black dark:text-oai-white">
-          Token Tracker
+          TokenUsage
         </span>
       </Link>
       <div className="w-10 shrink-0" aria-hidden />
