@@ -370,31 +370,31 @@ function TopModelsWidgetHost() {
 
   return (
     <WidgetShell appearanceOpacity={appearance.opacity}>
-      <div className="flex h-full flex-col justify-center px-[16px] py-[14px] text-white">
-        <div className="space-y-[9px]">
+      <div className="flex h-full flex-col justify-center px-[14px] py-[10px] text-white">
+        <div className="space-y-[7px]">
           {models.slice(0, 4).map((model, index) => {
             const color = MODEL_COLORS[index % MODEL_COLORS.length];
             const pct = Number(model?.percent || 0);
             return (
-              <div key={model.id || model.name} className="space-y-[5px]">
-                <div className="grid grid-cols-[minmax(0,1fr)_42px_28px] items-center gap-[7px] text-[9px] leading-[1.2]">
-                  <div className="flex min-w-0 items-center gap-[6px] py-[1px]">
+              <div key={model.id || model.name} className="space-y-[4px]">
+                <div className="grid grid-cols-[minmax(0,1fr)_46px_30px] items-center gap-[6px] text-[10px] leading-[1.15]">
+                  <div className="flex min-w-0 items-center gap-[6px] py-[2px]">
                   <span
-                    className="h-[5px] w-[5px] rounded-full shrink-0"
+                    className="h-[6px] w-[6px] rounded-full shrink-0"
                     style={{ background: color }}
                   />
-                  <span className="min-w-0 truncate font-semibold text-white/88 leading-[1.2]">
-                    {middleEllipsis(model.name, 24)}
+                  <span className="min-w-0 truncate font-semibold text-white/92 leading-[1.15]">
+                    {middleEllipsis(model.name, 20)}
                   </span>
                   </div>
-                  <span className="shrink-0 font-semibold text-white/78">
+                  <span className="shrink-0 font-semibold text-white/84">
                     {formatCompact(model.tokens)}
                   </span>
-                  <span className="w-[28px] shrink-0 text-right text-[8px] font-medium text-white/44">
+                  <span className="w-[30px] shrink-0 text-right text-[9px] font-medium text-white/58">
                     {pct}%
                   </span>
                 </div>
-                <div className="ml-[11px] h-[3px] rounded-full bg-white/18">
+                <div className="ml-[12px] h-[3px] rounded-full bg-white/18">
                   <div
                     className="h-[3px] rounded-full"
                     style={{
@@ -418,36 +418,38 @@ function LimitsWidgetHost() {
   const [rows, setRows] = useState([]);
 
   const buildLimitRows = (res) => {
-    const nextRows = [];
-    const pushRow = (label, source, pct, reset) => {
-      if (!Number.isFinite(Number(pct))) return;
-      nextRows.push({
-        label,
-        source,
-        pct: Number(pct),
-        reset: reset || "",
-      });
-    };
+    const specs = [
+      {
+        label: "Codex · 5h",
+        source: "codex",
+        pct: Number(res?.codex?.primary_window?.used_percent || 0),
+        reset: formatLimitReset(res?.codex?.primary_window?.reset_at),
+      },
+      {
+        label: "Codex · 7d",
+        source: "codex",
+        pct: Number(res?.codex?.secondary_window?.used_percent || 0),
+        reset: formatLimitReset(res?.codex?.secondary_window?.reset_at),
+      },
+      {
+        label: "Claude · 5h",
+        source: "claude",
+        pct: Number(res?.claude?.five_hour?.utilization || 0),
+        reset: formatLimitReset(res?.claude?.five_hour?.resets_at),
+      },
+      {
+        label: "Claude · 7d",
+        source: "claude",
+        pct: Number(res?.claude?.seven_day?.utilization || 0),
+        reset: formatLimitReset(res?.claude?.seven_day?.resets_at),
+      },
+    ];
 
-    if (res?.claude?.five_hour) pushRow("Claude · 5h", "claude", res.claude.five_hour.utilization, formatLimitReset(res.claude.five_hour.resets_at));
-    if (res?.claude?.seven_day) pushRow("Claude · 7d", "claude", res.claude.seven_day.utilization, formatLimitReset(res.claude.seven_day.resets_at));
-    if (res?.claude?.seven_day_opus) pushRow("Claude · Opus", "claude", res.claude.seven_day_opus.utilization, formatLimitReset(res.claude.seven_day_opus.resets_at));
-
-    if (res?.codex?.primary_window) pushRow("Codex · 5h", "codex", res.codex.primary_window.used_percent, formatLimitReset(res.codex.primary_window.reset_at));
-    if (res?.codex?.secondary_window) pushRow("Codex · 7d", "codex", res.codex.secondary_window.used_percent, formatLimitReset(res.codex.secondary_window.reset_at));
-
-    if (res?.cursor?.primary_window) pushRow("Cursor", "cursor", res.cursor.primary_window.used_percent, formatLimitReset(res.cursor.primary_window.reset_at));
-    if (res?.cursor?.secondary_window) pushRow("Cursor Auto", "cursor", res.cursor.secondary_window.used_percent, formatLimitReset(res.cursor.secondary_window.reset_at));
-    if (res?.cursor?.tertiary_window) pushRow("Cursor API", "cursor", res.cursor.tertiary_window.used_percent, formatLimitReset(res.cursor.tertiary_window.reset_at));
-
-    if (res?.gemini?.primary_window) pushRow("Gemini", "gemini", res.gemini.primary_window.used_percent, formatLimitReset(res.gemini.primary_window.reset_at));
-    if (res?.gemini?.secondary_window) pushRow("Gemini Flash", "gemini", res.gemini.secondary_window.used_percent, formatLimitReset(res.gemini.secondary_window.reset_at));
-    if (res?.gemini?.tertiary_window) pushRow("Gemini Lite", "gemini", res.gemini.tertiary_window.used_percent, formatLimitReset(res.gemini.tertiary_window.reset_at));
-
-    if (res?.copilot?.primary_window) pushRow("Copilot", "cursor", res.copilot.primary_window.used_percent, formatLimitReset(res.copilot.primary_window.reset_at));
-    if (res?.copilot?.secondary_window) pushRow("Copilot Chat", "cursor", res.copilot.secondary_window.used_percent, formatLimitReset(res.copilot.secondary_window.reset_at));
-
-    return nextRows.slice(0, 4);
+    return specs.map((row) => ({
+      ...row,
+      pct: Number.isFinite(row.pct) ? row.pct : 0,
+      reset: row.reset || "",
+    }));
   };
 
   useWidgetClock(
@@ -464,26 +466,26 @@ function LimitsWidgetHost() {
 
   return (
     <WidgetShell appearanceOpacity={appearance.opacity}>
-      <div className="flex h-full flex-col justify-center px-[18px] py-[16px] text-white">
+      <div className="flex h-full flex-col justify-center px-[16px] py-[14px] text-white">
         {rows.length > 0 ? (
-          <div className="space-y-[10px]">
+          <div className="space-y-[9px]">
             {rows.map((row, index) => {
               const pct = Math.round(Number(row.pct || 0));
               const fill = limitBarFill(Math.max(0, Math.min(1, pct / 100)));
               return (
                 <div key={`${row.label}-${index}`} className="space-y-[4px]">
-                  <div className="flex items-center gap-[6px] text-[9px] leading-none">
+                  <div className="flex items-center gap-[6px] text-[10px] leading-none">
                     <span
-                      className="h-[5px] w-[5px] rounded-full shrink-0"
+                      className="h-[6px] w-[6px] rounded-full shrink-0"
                       style={{ background: SOURCE_COLORS[row.source] || "#0A84FF" }}
                     />
-                    <span className="min-w-0 flex-1 truncate font-medium text-white/84">
+                    <span className="min-w-0 flex-1 truncate font-semibold text-white/90">
                       {row.label}
                     </span>
-                    <span className="shrink-0 text-[8px] font-medium text-white/44">
+                    <span className="shrink-0 text-[9px] font-medium text-white/56">
                       {row.reset}
                     </span>
-                    <span className="w-[30px] shrink-0 text-right font-semibold text-white/82">
+                    <span className="w-[30px] shrink-0 text-right font-semibold text-white/88">
                       {pct}%
                     </span>
                   </div>

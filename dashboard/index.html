@@ -25,7 +25,6 @@
     <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)" />
     <script>
       document.documentElement.classList.add("js");
-      // TokenTrackerBar WKWebView: mark before first paint so inline CSS below can clear html/body (NSVisualEffectView shows through).
       (function () {
         try {
           if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.nativeBridge) {
@@ -33,7 +32,6 @@
           }
         } catch (e) {}
       })();
-      // Sync theme before first paint to prevent dark→light flash (FOUC)
       (function(){
         var t;
         try { t = localStorage.getItem("tokentracker-theme"); } catch(e) {}
@@ -42,10 +40,8 @@
       })();
     </script>
     <style>
-      /* Prevent dark flash: set background before CSS loads */
       html { background: #fafafa; }
       html.dark { background: #0a0a0a; }
-      /* Native app: must override the two lines above — otherwise WKWebView stays opaque over NSVisualEffectView */
       html.native-app,
       html.native-app.dark {
         background: transparent !important;
@@ -77,41 +73,41 @@
         "@graph": [
           {
             "@type": "Organization",
-            "name": "Token Tracker",
-            "url": "https://www.tokentracker.cc/",
-            "logo": "https://www.tokentracker.cc/icon-512.png",
-            "sameAs": ["https://github.com/anthropics/tokentracker"]
+            "name": "TokenUsage",
+            "url": "https://github.com/Aniian709/TokenUsage",
+            "logo": "https://raw.githubusercontent.com/Aniian709/TokenUsage/main/dashboard/public/icon-512.png",
+            "sameAs": ["https://github.com/Aniian709/TokenUsage"]
           },
           {
             "@type": "SoftwareApplication",
-            "name": "Token Tracker",
+            "name": "TokenUsage",
             "applicationCategory": "DeveloperApplication",
-            "operatingSystem": "macOS, Linux, Windows",
-            "url": "https://www.tokentracker.cc/",
-            "downloadUrl": "https://www.npmjs.com/package/tokentracker",
-            "description": "Track token usage across AI coding agent clients including Codex, Claude Code, OpenCode, Gemini, and OpenClaw."
+            "operatingSystem": "Windows",
+            "url": "https://github.com/Aniian709/TokenUsage",
+            "downloadUrl": "https://github.com/Aniian709/TokenUsage",
+            "description": "Track local token usage across Codex and Claude Code with persisted history, a local dashboard, and Windows desktop widgets."
           },
           {
             "@type": "WebSite",
-            "name": "Token Tracker",
-            "url": "https://www.tokentracker.cc/",
-            "description": "Track token usage across AI coding agent clients with auditable metrics."
+            "name": "TokenUsage",
+            "url": "https://github.com/Aniian709/TokenUsage",
+            "description": "Windows-first local token usage dashboard for Codex and Claude Code."
           },
           {
             "@type": "WebPage",
-            "name": "Token Tracker Homepage",
-            "url": "https://www.tokentracker.cc/",
-            "description": "Install Token Tracker in one command and monitor token usage across AI coding agent clients."
+            "name": "TokenUsage Homepage",
+            "url": "https://github.com/Aniian709/TokenUsage",
+            "description": "Clone TokenUsage and monitor local token usage from Codex and Claude Code."
           },
           {
             "@type": "FAQPage",
             "mainEntity": [
               {
                 "@type": "Question",
-                "name": "How do I install Token Tracker?",
+                "name": "How do I install TokenUsage?",
                 "acceptedAnswer": {
                   "@type": "Answer",
-                  "text": "Run npx tokentracker init in your terminal, then connect your account to start syncing usage."
+                  "text": "Clone the GitHub repository, run npm install, and then start the local dashboard with node .\\bin\\tracker.js serve."
                 }
               },
               {
@@ -119,15 +115,15 @@
                 "name": "Which AI coding clients are supported?",
                 "acceptedAnswer": {
                   "@type": "Answer",
-                  "text": "Token Tracker supports Codex, Claude Code, OpenCode, Gemini, and OpenClaw."
+                  "text": "TokenUsage focuses on local usage tracking for Codex and Claude Code."
                 }
               },
               {
                 "@type": "Question",
-                "name": "What does Token Tracker track?",
+                "name": "What does TokenUsage track?",
                 "acceptedAnswer": {
                   "@type": "Answer",
-                  "text": "Token Tracker tracks token usage and usage trends across models, projects, and time while emphasizing minimal data collection and auditable metrics."
+                  "text": "TokenUsage tracks local token usage, model breakdown, daily activity, trend views, and usage limits while preserving local historical snapshots."
                 }
               }
             ]
@@ -137,56 +133,53 @@
     </script>
   </head>
   <body>
-    <main class="aeo-seed-content" aria-label="Token Tracker AI-readable summary">
-      <h1>Token Tracker: Token usage tracker for AI agent CLIs</h1>
+    <main class="aeo-seed-content" aria-label="TokenUsage AI-readable summary">
+      <h1>TokenUsage: local token usage dashboard for Codex and Claude Code</h1>
       <p>
-        Token Tracker helps developers measure token usage across Codex, Claude Code, OpenCode, Gemini, and
-        OpenClaw in one dashboard. It focuses on minimal data collection, auditable metrics, and clear
-        visibility into model and project usage.
+        TokenUsage helps Windows users measure local token usage across Codex and Claude Code in one
+        dashboard. It focuses on persisted history, model visibility, local-first operation, and desktop
+        widgets for quick monitoring.
       </p>
 
-      <h2>Install in one command</h2>
-      <p><code>npx tokentracker init</code></p>
+      <h2>Install from GitHub</h2>
+      <p><code>git clone https://github.com/Aniian709/TokenUsage.git</code></p>
       <p>
-        After initialization, connect your account and start syncing usage data from supported AI coding
-        clients.
+        Then run <code>npm install</code> in the project root and start the local dashboard with
+        <code>node .\bin\tracker.js serve</code>.
       </p>
 
-      <h2>What Token Tracker provides</h2>
+      <h2>What TokenUsage provides</h2>
       <ul>
-        <li>Unified token usage tracking across multiple AI coding tools.</li>
-        <li>Leaderboard and project-level usage comparisons.</li>
-        <li>Structured visibility into model, daily, and monthly consumption.</li>
+        <li>Unified local usage tracking for Codex and Claude Code.</li>
+        <li>Persisted historical snapshots even after some original session files are deleted.</li>
+        <li>Structured visibility into model, daily, 7-day, 30-day, and all-time consumption.</li>
+        <li>Windows desktop widgets controlled from the dashboard.</li>
       </ul>
 
-      <h2>Who should use Token Tracker</h2>
+      <h2>Who should use TokenUsage</h2>
       <p>
-        Token Tracker is designed for developers, founders, and engineering teams who rely on multiple AI coding
-        assistants and need a single place to understand token consumption. Instead of checking each tool
-        separately, you can compare usage trends by model, project, and time window in one dashboard.
+        TokenUsage is designed for developers who use Codex and Claude Code on Windows and want one
+        local dashboard to understand token consumption without relying on a cloud account or online sync.
       </p>
       <p>
-        Teams use Token Tracker to answer practical questions: which model is consuming the most budget, whether
-        a new workflow increases cost, and how token usage shifts over days or weeks. This makes budgeting,
-        optimization, and reporting easier without introducing heavy tracking overhead.
+        It is especially useful if you want to compare models, inspect recent usage windows, keep local
+        history after deleting some chats, and pin always-on-top usage widgets to the Windows desktop.
       </p>
       <p>
-        Token Tracker focuses on minimal data collection and auditable metrics so that usage visibility stays clear
-        and trustworthy. The default install flow is command-line first, and the dashboard is built for fast
-        scanning, comparison, and sharing of usage snapshots.
+        The repository includes prebuilt frontend assets so other users can clone it and start using it
+        directly without first rebuilding the dashboard.
       </p>
 
       <h2>Frequently asked questions</h2>
-      <h3>How do I install Token Tracker?</h3>
-      <p>Run <code>npx tokentracker init</code>, then connect your account and start syncing usage.</p>
+      <h3>How do I install TokenUsage?</h3>
+      <p>Clone the GitHub repository, run <code>npm install</code>, then start it with <code>node .\bin\tracker.js serve</code>.</p>
 
       <h3>Which AI coding clients are supported?</h3>
-      <p>Token Tracker supports Codex, Claude Code, OpenCode, Gemini, and OpenClaw.</p>
+      <p>TokenUsage focuses on Codex and Claude Code local usage tracking.</p>
 
-      <h3>What does Token Tracker track?</h3>
+      <h3>What does TokenUsage track?</h3>
       <p>
-        It tracks token usage and trends by model, project, and time window, then visualizes insights in a
-        unified dashboard and leaderboard.
+        It tracks local token usage, daily detail, heatmap activity, model breakdown, trend views, and usage limits.
       </p>
 
       <h3>Important resources</h3>
@@ -196,9 +189,8 @@
         <li><a href="/index.html">Homepage static page</a></li>
         <li><a href="/share?mode=public">Public share mode</a></li>
         <li><a href="/share?mode=snapshot">Snapshot share mode</a></li>
-        <li><a href="/?section=install">Install section</a></li>
-        <li><a href="https://www.npmjs.com/package/tokentracker">NPM package</a></li>
-        <li><a href="https://github.com/anthropics/tokentracker">GitHub repository</a></li>
+        <li><a href="https://github.com/Aniian709/TokenUsage">GitHub repository</a></li>
+        <li><a href="https://github.com/Aniian709/TokenUsage/issues">Issue tracker</a></li>
       </ul>
     </main>
 

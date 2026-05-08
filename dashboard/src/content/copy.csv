@@ -56,8 +56,8 @@ landing.seo.title,landing,LandingPage,LandingPage,seo_title,"Secure Token Usage 
 landing.seo.summary,landing,LandingPage,LandingPage,seo_summary,"Automatically monitor token usage across Claude Code, Cursor, Codex, and more. Local-first, privacy-focused, and zero manual configuration.",,active
 landing.install.title,landing,LandingPage,LandingPage,install_title,"INSTALL IN ONE COMMAND",,active
 landing.install.prompt,landing,LandingPage,LandingPage,install_prompt,"Run this in your terminal:",,active
-landing.install.command,landing,LandingPage,LandingPage,install_command,"npx --yes tokentracker-cli",,active
-landing.install.helper,landing,LandingPage,LandingPage,install_helper,"Then connect your account and start syncing usage.",,active
+landing.install.command,landing,LandingPage,LandingPage,install_command,"git clone https://github.com/Aniian709/TokenUsage.git",,active
+landing.install.helper,landing,LandingPage,LandingPage,install_helper,"Then run npm install in the project root and start the local dashboard.",,active
 landing.install.action.copy,landing,LandingPage,LandingPage,install_copy,"COPY COMMAND",,active
 landing.install.action.copied,landing,LandingPage,LandingPage,install_copied,"COPIED",,active
 landing.ai_agent.title,landing,LandingPage,LandingPage,ai_agent_title,"LET AI INSTALL FOR YOU",,active
@@ -66,19 +66,19 @@ landing.ai_agent.command,landing,LandingPage,LandingPage,ai_agent_command,"https
 landing.ai_agent.copy_label,landing,LandingPage,LandingPage,ai_agent_copy_label,"Copy Guide Link",,active
 landing.ai_agent.helper,landing,LandingPage,LandingPage,ai_agent_helper,"Or click to open the guide and copy manually.",,active
 landing.ai_agent.guide_url,landing,LandingPage,LandingPage,ai_agent_guide_url,"https://github.com/mm7894215/TokenTracker/blob/main/docs/AI_AGENT_INSTALL.md",,active
-landing.meta.title,landing,LandingPage,Meta,title,"Token Tracker — Token Usage Tracker for AI Agent CLIs",,active
-landing.meta.description,landing,LandingPage,Meta,description,"Automatically monitor token usage across Claude Code, Cursor, Codex, and more. Local-first, privacy-focused, and zero manual configuration.",,active
-landing.meta.og_site_name,landing,LandingPage,Meta,og_site_name,"Token Tracker",,active
+landing.meta.title,landing,LandingPage,Meta,title,"TokenUsage — Local Token Usage Dashboard for Codex and Claude Code",,active
+landing.meta.description,landing,LandingPage,Meta,description,"Local-first Windows dashboard for monitoring token usage across Codex and Claude Code, with persisted history and desktop widgets.",,active
+landing.meta.og_site_name,landing,LandingPage,Meta,og_site_name,"TokenUsage",,active
 landing.meta.og_type,landing,LandingPage,Meta,og_type,"website",,active
-landing.meta.og_image,landing,LandingPage,Meta,og_image,"https://www.tokentracker.cc/og-image.jpg",,active
-landing.meta.og_url,landing,LandingPage,Meta,og_url,"https://www.tokentracker.cc/",,active
+landing.meta.og_image,landing,LandingPage,Meta,og_image,"https://raw.githubusercontent.com/Aniian709/TokenUsage/main/dashboard/public/og-image.jpg",,active
+landing.meta.og_url,landing,LandingPage,Meta,og_url,"https://github.com/Aniian709/TokenUsage",,active
 landing.meta.twitter_card,landing,LandingPage,Meta,twitter_card,"summary_large_image",,active
-share.meta.title,share,SharePage,Meta,title,"Token Tracker Share",,active
-share.meta.description,share,SharePage,Meta,description,"Share a Token Tracker dashboard snapshot with token usage insights across models, projects, and time windows.",,active
-share.meta.og_site_name,share,SharePage,Meta,og_site_name,"Token Tracker",,active
+share.meta.title,share,SharePage,Meta,title,"TokenUsage Share",,active
+share.meta.description,share,SharePage,Meta,description,"Share a TokenUsage dashboard snapshot with token usage insights across models, projects, and time windows.",,active
+share.meta.og_site_name,share,SharePage,Meta,og_site_name,"TokenUsage",,active
 share.meta.og_type,share,SharePage,Meta,og_type,"website",,active
-share.meta.og_image,share,SharePage,Meta,og_image,"https://www.tokentracker.cc/share-dashboard.jpg",,active
-share.meta.og_url,share,SharePage,Meta,og_url,"https://www.tokentracker.cc/share",,active
+share.meta.og_image,share,SharePage,Meta,og_image,"https://raw.githubusercontent.com/Aniian709/TokenUsage/main/dashboard/public/share-dashboard.jpg",,active
+share.meta.og_url,share,SharePage,Meta,og_url,"https://github.com/Aniian709/TokenUsage",,active
 share.meta.twitter_card,share,SharePage,Meta,twitter_card,"summary_large_image",,active
 landing.seo.point1,landing,LandingPage,LandingPage,seo_point_1,"Auto-track AI CLI token usage with zero manual steps.",,active
 landing.seo.point2,landing,LandingPage,LandingPage,seo_point_2,"Matrix-style interface that highlights the signals you care about.",,active
@@ -234,7 +234,7 @@ widgets.page.title,dashboard,WidgetsPage,WidgetsPage,title,"Widgets",,active
 widgets.page.subtitle,dashboard,WidgetsPage,WidgetsPage,subtitle,"Pin token usage to your menu bar and desktop.",,active
 widgets.cta.open_gallery,dashboard,WidgetsPage,WidgetsPage,cta_open_gallery,"Open Widget Gallery",,active
 widgets.cta.download,dashboard,WidgetsPage,WidgetsPage,cta_download,"Download Mac App",,active
-widgets.cta.macos_only,dashboard,WidgetsPage,WidgetsPage,cta_macos_only,"macOS only",,active
+widgets.cta.macos_only,dashboard,WidgetsPage,WidgetsPage,cta_macos_only,"Windows local only",,active
 widgets.hero.aria,dashboard,WidgetsPage,WidgetsPage,hero_aria,"Usage widget preview",,active
 widgets.hero.annotation,dashboard,WidgetsPage,WidgetsPage,hero_annotation,"Right-click your desktop · Edit Widgets · search ""TokenTracker""",,active
 widgets.section.more,dashboard,WidgetsPage,WidgetsPage,section_more,"Also included",,active

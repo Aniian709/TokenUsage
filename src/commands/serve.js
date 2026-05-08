@@ -192,6 +192,25 @@ async function cmdServe(argv) {
 }
 
 function findPidOnPort(port) {
+  if (process.platform === "win32") {
+    try {
+      const out = cp.execFileSync("netstat", ["-ano"], { encoding: "utf8", timeout: 5000 });
+      const matches = String(out)
+        .split(/\r?\n/)
+        .map((line) => line.trim())
+        .filter((line) => line.includes(`:${port}`) && /\bLISTENING\b/i.test(line));
+      const pids = matches
+        .map((line) => {
+          const parts = line.split(/\s+/);
+          return Number(parts.at(-1));
+        })
+        .filter((n) => Number.isFinite(n) && n > 0);
+      return Array.from(new Set(pids));
+    } catch (_e) {
+      return [];
+    }
+  }
+
   try {
     const out = cp.execFileSync("lsof", ["-ti", `tcp:${port}`], { encoding: "utf8", timeout: 5000 });
     const pids = out.trim().split(/\s+/).map(Number).filter((n) => Number.isFinite(n) && n > 0);

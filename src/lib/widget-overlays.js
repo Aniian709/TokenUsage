@@ -11,8 +11,8 @@ const DEFAULT_WIDGETS = {
   menubar: { enabled: false, x: 560, y: 16, width: 220, height: 54 },
   summary: { enabled: false, x: 32, y: 32, width: 264, height: 124 },
   heatmap: { enabled: false, x: 32, y: 176, width: 264, height: 124 },
-  topModels: { enabled: false, x: 320, y: 32, width: 264, height: 124 },
-  limits: { enabled: false, x: 320, y: 176, width: 264, height: 124 },
+  topModels: { enabled: false, x: 320, y: 32, width: 224, height: 124 },
+  limits: { enabled: false, x: 320, y: 176, width: 224, height: 124 },
 };
 
 function resolveOverlayDir(home = os.homedir()) {

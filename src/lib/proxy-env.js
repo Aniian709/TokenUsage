@@ -21,6 +21,22 @@ function parseMacProxyOutput(output) {
   return `http://${values.HTTPSProxy}:${values.HTTPSPort}`;
 }
 
+function parseWindowsProxyOutput(output) {
+  const text = String(output || "");
+  const enabled = /ProxyEnable\s+REG_DWORD\s+0x1/i.test(text);
+  const match = text.match(/ProxyServer\s+REG_SZ\s+([^\r\n]+)/i);
+  if (!enabled || !match) return null;
+  const raw = String(match[1] || "").trim();
+  if (!raw) return null;
+  const server = raw.includes("=")
+    ? (raw.split(";").find((entry) => /^https?=|^socks=/i.test(entry)) || raw.split(";")[0] || "")
+    : raw;
+  const value = server.replace(/^(https?|socks)=/i, "").trim();
+  if (!value) return null;
+  if (/^https?:\/\//i.test(value)) return value;
+  return `http://${value}`;
+}
+
 function resolveSystemProxyEnv({ env = process.env, platform = process.platform, commandRunner = cp.spawnSync } = {}) {
   const out = {};
   if (hasProxyEnv(env)) {
@@ -28,13 +44,25 @@ function resolveSystemProxyEnv({ env = process.env, platform = process.platform,
     return out;
   }
 
-  if (platform !== "darwin") return null;
-  const result = commandRunner("scutil", ["--proxy"], {
-    encoding: "utf8",
-    timeout: 2000,
-  });
-  if (result?.error || result?.status !== 0) return null;
-  const proxyUrl = parseMacProxyOutput(result.stdout);
+  let proxyUrl = null;
+  if (platform === "darwin") {
+    const result = commandRunner("scutil", ["--proxy"], {
+      encoding: "utf8",
+      timeout: 2000,
+    });
+    if (result?.error || result?.status !== 0) return null;
+    proxyUrl = parseMacProxyOutput(result.stdout);
+  } else if (platform === "win32") {
+    const result = commandRunner("reg", ["query", "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Internet Settings"], {
+      encoding: "utf8",
+      timeout: 3000,
+    });
+    if (result?.error || result?.status !== 0) return null;
+    proxyUrl = parseWindowsProxyOutput(result.stdout);
+  } else {
+    return null;
+  }
+
   if (!proxyUrl) return null;
 
   return {
@@ -76,6 +104,7 @@ function relaunchWithProxyEnvIfNeeded({
 module.exports = {
   hasProxyEnv,
   parseMacProxyOutput,
+  parseWindowsProxyOutput,
   resolveSystemProxyEnv,
   relaunchWithProxyEnvIfNeeded,
 };

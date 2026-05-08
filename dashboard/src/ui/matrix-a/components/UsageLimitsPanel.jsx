@@ -90,6 +90,12 @@ function StatusLine({ children, tone = "neutral" }) {
   return <div className={`text-[11px] leading-snug ${color}`}>{children}</div>;
 }
 
+function isTransientProviderFetchError(message) {
+  const text = String(message || "").trim().toLowerCase();
+  if (!text) return false;
+  return text === "fetch failed" || text.includes("networkerror") || text.includes("failed to fetch");
+}
+
 function renderProviderGroup(id, data) {
   const meta = PROVIDER_META[id];
   if (!meta) return null;
@@ -101,6 +107,13 @@ function renderProviderGroup(id, data) {
     );
   }
   if (data.error) {
+    if (isTransientProviderFetchError(data.error)) {
+      return (
+        <ToolGroup key={id} name={meta.name} icon={meta.icon}>
+          <StatusLine>{copy("limits.status.not_connected")}</StatusLine>
+        </ToolGroup>
+      );
+    }
     return (
       <ToolGroup key={id} name={meta.name} icon={meta.icon}>
         <StatusLine tone="error">{copy("shared.error.prefix", { error: data.error })}</StatusLine>
