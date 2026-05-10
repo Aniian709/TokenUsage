@@ -2,6 +2,7 @@ const os = require("node:os");
 const path = require("node:path");
 const fs = require("node:fs/promises");
 const { readJson } = require("./fs");
+const { resolveTrackerRootDir } = require("./tracker-paths");
 
 /**
  * 跨 AI CLI 自动激活检测
@@ -84,7 +85,7 @@ async function checkAndActivate({ home = os.homedir(), silent = true, autoConfig
         });
         
         if (!silent) {
-          console.log(`⏳ 检测到 ${cli.displayName} 未配置，运行 'tokentracker init' 以配置`);
+          console.log(`⏳ 检测到 ${cli.displayName} 未配置，运行 'tokenusage init' 以配置`);
         }
       }
     } catch (err) {
@@ -125,9 +126,9 @@ async function configureCodex({ home, silent }) {
   try {
     // 使用现有的 codex-config 模块
     const { upsertCodexNotify } = require("./codex-config");
-    const notifyCmd = path.join(home, ".tokentracker", "bin", "notify.cjs");
+    const notifyCmd = path.join(resolveTrackerRootDir(home), "bin", "notify.cjs");
     const codexConfigPath = path.join(home, ".codex", "config.toml");
-    const notifyOriginalPath = path.join(home, ".tokentracker", "backups", "codex-notify-original.json");
+    const notifyOriginalPath = path.join(resolveTrackerRootDir(home), "backups", "codex-notify-original.json");
     
     await upsertCodexNotify({
       codexConfigPath,
@@ -231,7 +232,7 @@ async function configureOpencode({ home, silent }) {
     const pluginCode = `export const TokentrackerActivation = async ({ $ }) => {
   return {
     "session.created": async () => {
-      await $'tokentracker activate-if-needed --silent'.quiet().nothrow();
+      await $'tokenusage activate-if-needed --silent'.quiet().nothrow();
     }
   };
 };`;
@@ -277,7 +278,7 @@ async function configureEveryCode({ home, silent }) {
       content = "";
     }
     
-    const notifyCmd = path.join(home, ".tokentracker", "bin", "notify.cjs");
+    const notifyCmd = path.join(resolveTrackerRootDir(home), "bin", "notify.cjs");
     const notifyLine = `notify = ["/usr/bin/env", "node", "${notifyCmd}"]`;
 
     if (!content.includes("tokentracker")) {
@@ -329,7 +330,7 @@ async function configureOpenclaw({ home, silent }) {
     const result = await installOpenclawSessionPlugin({
       home,
       trackerDir,
-      packageName: "tokentracker-cli",
+      packageName: "tokenusage-cli",
       env: process.env,
     });
     

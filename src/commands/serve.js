@@ -12,7 +12,7 @@ const { openInBrowser } = require("../lib/browser-auth");
 const { syncOverlayHost, stopOverlayHost } = require("../lib/widget-overlays");
 
 const DEFAULT_PORT = 7680;
-const NPM_PACKAGE_NAME = "tokentracker-cli";
+const NPM_PACKAGE_NAME = "tokenusage";
 const LOCAL_BIND_HOST = "127.0.0.1";
 
 function buildPortInUseHint(port) {
@@ -29,7 +29,7 @@ async function cmdServe(argv) {
   // 0. First-time setup: if tracker dir doesn't exist, run init first
   const { trackerDir } = await resolveTrackerPaths();
   if (!fssync.existsSync(path.join(trackerDir, "cursors.json"))) {
-    process.stdout.write("First time? Setting up Token Tracker...\n\n");
+    process.stdout.write("First time? Setting up TokenUsage...\n\n");
     try {
       const { cmdInit } = require("./init");
       await cmdInit(["--yes"]);
@@ -144,7 +144,7 @@ async function cmdServe(argv) {
     process.stdout.write(
       [
         "",
-        `  tokentracker dashboard running at:`,
+        `  TokenUsage dashboard running at:`,
         "",
         `    ${url}`,
         "",

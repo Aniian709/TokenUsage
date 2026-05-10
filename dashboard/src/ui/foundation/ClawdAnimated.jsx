@@ -1,62 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-
-/**
- * SVG path mapping: state name → file path under /clawd/
- */
-const STATE_TO_PATH = {
-  // Idle
-  "idle-living": "idle/living.svg",
-  "idle-doze": "idle/doze.svg",
-  "idle-follow": "idle/follow.svg",
-  "idle-look": "idle/look.svg",
-  "idle-yawn": "idle/yawn.svg",
-  "idle-collapse": "idle/collapse.svg",
-
-  // Working
-  "working-building": "working/building.svg",
-  "working-carrying": "working/carrying.svg",
-  "working-conducting": "working/conducting.svg",
-  "working-confused": "working/confused.svg",
-  "working-debugger": "working/debugger.svg",
-  "working-juggling": "working/juggling.svg",
-  "working-overheated": "working/overheated.svg",
-  "working-pushing": "working/pushing.svg",
-  "working-sweeping": "working/sweeping.svg",
-  "working-thinking": "working/thinking.svg",
-  "working-typing": "working/typing.svg",
-  "working-ultrathink": "working/ultrathink.svg",
-  "working-wizard": "working/wizard.svg",
-
-  // Mini
-  "mini-alert": "mini/alert.svg",
-  "mini-crabwalk": "mini/crabwalk.svg",
-  "mini-enter": "mini/enter.svg",
-  "mini-enter-sleep": "mini/enter-sleep.svg",
-  "mini-happy": "mini/happy.svg",
-  "mini-idle": "mini/idle.svg",
-  "mini-peek": "mini/peek.svg",
-  "mini-sleep": "mini/sleep.svg",
-
-  // React
-  "react-double": "react/double.svg",
-  "react-drag": "react/drag.svg",
-  "react-left": "react/left.svg",
-  "react-right": "react/right.svg",
-
-  // Sleep
-  "collapse-sleep": "sleep/collapse-sleep.svg",
-  "sleeping": "sleep/sleeping.svg",
-  "wake": "sleep/wake.svg",
-
-  // Status
-  "disconnected": "status/disconnected.svg",
-  "error": "status/error.svg",
-  "notification": "status/notification.svg",
-
-  // Other
-  "happy": "happy.svg",
-  "static-base": "static-base.svg",
-};
+import { CLAWD_STATE_TO_PATH, CLAWD_STATES } from "../../lib/clawd-animations.js";
 
 /** Module-level SVG text cache */
 const svgCache = new Map();
@@ -85,13 +28,20 @@ async function fetchSvg(path) {
  * @param {number} size - Display size in pixels
  * @param {string} className - Additional CSS classes
  */
-export function ClawdAnimated({ state = "idle-living", size = 48, className = "" }) {
+export function ClawdAnimated({
+  state = "idle-living",
+  size = 48,
+  className = "",
+  crop = true,
+  cropPadding = 2,
+  onMeasure,
+}) {
   const [svgHtml, setSvgHtml] = useState("");
   const containerRef = useRef(null);
   const reducedMotion = useReducedMotion();
 
   const effectiveState = reducedMotion ? "static-base" : state;
-  const path = STATE_TO_PATH[effectiveState] || STATE_TO_PATH["static-base"];
+  const path = CLAWD_STATE_TO_PATH[effectiveState] || CLAWD_STATE_TO_PATH["static-base"];
 
   useEffect(() => {
     let cancelled = false;
@@ -107,17 +57,34 @@ export function ClawdAnimated({ state = "idle-living", size = 48, className = ""
     if (!svg) return;
     try {
       const bbox = svg.getBBox();
-      if (bbox.width > 0 && bbox.height > 0) {
-        const pad = 2;
+      const originalViewBox = svg.getAttribute("viewBox");
+      let viewWidth = 0;
+      let viewHeight = 0;
+      if (originalViewBox) {
+        const parts = originalViewBox.trim().split(/\s+/).map(Number);
+        viewWidth = Number(parts[2] || 0);
+        viewHeight = Number(parts[3] || 0);
+      }
+      if (bbox.width > 0 && bbox.height > 0 && crop) {
         svg.setAttribute(
           "viewBox",
-          `${bbox.x - pad} ${bbox.y - pad} ${bbox.width + pad * 2} ${bbox.height + pad * 2}`,
+          `${bbox.x - cropPadding} ${bbox.y - cropPadding} ${bbox.width + cropPadding * 2} ${bbox.height + cropPadding * 2}`,
         );
+      }
+      if (typeof onMeasure === "function" && bbox.width > 0 && bbox.height > 0) {
+        onMeasure({
+          bbox,
+          viewWidth,
+          viewHeight,
+          contentWidthRatio: viewWidth > 0 ? bbox.width / viewWidth : 1,
+          contentHeightRatio: viewHeight > 0 ? bbox.height / viewHeight : 1,
+        });
       }
     } catch {
       // Some SVGs do not expose getBBox until fully rendered.
     }
-  }, [svgHtml]);
+    return undefined;
+  }, [crop, cropPadding, onMeasure, svgHtml]);
 
   return (
     <div
@@ -137,7 +104,7 @@ export function ClawdAnimated({ state = "idle-living", size = 48, className = ""
 }
 
 /** All available animation state names */
-export const CLAWD_STATES = Object.keys(STATE_TO_PATH);
+export { CLAWD_STATES };
 
 function useReducedMotion() {
   const [reduced, setReduced] = useState(() => {

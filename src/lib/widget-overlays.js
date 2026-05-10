@@ -3,7 +3,7 @@ const fsp = require("node:fs/promises");
 const os = require("node:os");
 const path = require("node:path");
 const { spawn } = require("node:child_process");
-
+const { resolveTrackerRootDir } = require("./tracker-paths");
 const HOST_PID_FILE = "widget-host.pid";
 const CONFIG_FILE = "widget-overlays.json";
 
@@ -15,8 +15,117 @@ const DEFAULT_WIDGETS = {
   limits: { enabled: false, x: 320, y: 176, width: 224, height: 124 },
 };
 
+const MENU_BAR_CLAWD_STATES = new Set([
+  "idle-living",
+  "idle-doze",
+  "idle-follow",
+  "idle-look",
+  "idle-yawn",
+  "idle-collapse",
+  "working-building",
+  "working-carrying",
+  "working-conducting",
+  "working-confused",
+  "working-debugger",
+  "working-juggling",
+  "working-overheated",
+  "working-pushing",
+  "working-sweeping",
+  "working-thinking",
+  "working-typing",
+  "working-ultrathink",
+  "working-wizard",
+  "mini-alert",
+  "mini-crabwalk",
+  "mini-enter",
+  "mini-enter-sleep",
+  "mini-happy",
+  "mini-idle",
+  "mini-peek",
+  "mini-sleep",
+  "react-double",
+  "react-drag",
+  "react-left",
+  "react-right",
+  "collapse-sleep",
+  "sleeping",
+  "wake",
+  "disconnected",
+  "error",
+  "notification",
+  "happy",
+  "static-base",
+]);
+
+const DEFAULT_MENU_BAR_AUTO_STAGES = [
+  { id: "stage-1", min: 0, max: 0, state: "sleeping" },
+  { id: "stage-2", min: 0, max: 49_999, state: "idle-living" },
+  { id: "stage-3", min: 49_999, max: 199_999, state: "idle-look" },
+  { id: "stage-4", min: 199_999, max: 499_999, state: "working-ultrathink" },
+  { id: "stage-5", min: 499_999, max: 1_999_999, state: "working-typing" },
+  { id: "stage-6", min: 1_999_999, max: null, state: "working-ultrathink" },
+];
+
+let autoStageCounter = DEFAULT_MENU_BAR_AUTO_STAGES.length;
+
+function nextAutoStageId() {
+  autoStageCounter += 1;
+  return `stage-${autoStageCounter}`;
+}
+
+function createMenuBarAutoStage(overrides = {}) {
+  return {
+    id: typeof overrides.id === "string" && overrides.id ? overrides.id : nextAutoStageId(),
+    min: Number.isFinite(overrides.min) ? Number(overrides.min) : 0,
+    max: overrides.max == null ? null : Number.isFinite(overrides.max) ? Number(overrides.max) : 0,
+    state: MENU_BAR_CLAWD_STATES.has(overrides.state) ? overrides.state : "idle-living",
+  };
+}
+
+function normalizeMenuBarAutoStages(stages) {
+  const source = Array.isArray(stages) && stages.length > 0 ? stages : DEFAULT_MENU_BAR_AUTO_STAGES;
+  let currentMin = 0;
+  return source.map((stage, index) => {
+    const safe = createMenuBarAutoStage(stage);
+    const isLast = index === source.length - 1;
+    const max = isLast
+      ? safe.max == null
+        ? null
+        : Math.max(currentMin, Number(safe.max))
+      : Math.max(currentMin, Number.isFinite(safe.max) ? Number(safe.max) : currentMin);
+    const normalized = {
+      id: safe.id,
+      min: currentMin,
+      max,
+      state: safe.state,
+    };
+    currentMin = max == null ? currentMin : Number(max);
+    return normalized;
+  });
+}
+
+function defaultMenuBarClawdConfig() {
+  return {
+    mode: "auto",
+    manualState: "idle-living",
+    autoStages: normalizeMenuBarAutoStages(DEFAULT_MENU_BAR_AUTO_STAGES),
+  };
+}
+
+function normalizeMenuBarClawdConfig(input) {
+  const base = defaultMenuBarClawdConfig();
+  const candidate = input && typeof input === "object" ? input : {};
+  return {
+    mode: candidate.mode === "manual" ? "manual" : "auto",
+    manualState: MENU_BAR_CLAWD_STATES.has(candidate.manualState)
+      ? candidate.manualState
+      : base.manualState,
+    autoStages: normalizeMenuBarAutoStages(candidate.autoStages),
+  };
+}
+
 function resolveOverlayDir(home = os.homedir()) {
-  return path.join(home, ".tokentracker", "tracker");
+  return path.join(resolveTrackerRootDir(home), "tracker");
 }
 
 function resolveOverlayConfigPath(home = os.homedir()) {
@@ -40,6 +149,7 @@ function defaultOverlayConfig() {
       items: ["todayTokens", "todayCost"],
       showStats: true,
       animatedIcon: true,
+      clawd: defaultMenuBarClawdConfig(),
     },
   };
 }
@@ -102,6 +212,7 @@ function normalizeOverlayConfig(config) {
       items: Array.isArray(menuBar.items) ? menuBar.items.slice(0, 2) : base.menuBar.items,
       showStats: menuBar.showStats !== false,
       animatedIcon: menuBar.animatedIcon !== false,
+      clawd: normalizeMenuBarClawdConfig(menuBar.clawd),
     },
   };
 }

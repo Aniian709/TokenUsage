@@ -180,7 +180,7 @@ async function healthcheck() {
 }
 
 app.whenReady().then(async () => {
-  app.setName("TokenTracker Widget Host");
+  app.setName("TokenUsage Widget Host");
   await applyOverlayConfig();
   await installWatcher();
   setInterval(() => {

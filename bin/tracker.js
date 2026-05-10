@@ -4,6 +4,7 @@
 const { run } = require('../src/cli');
 const { stripDebugFlag } = require('../src/lib/debug-flags');
 const { relaunchWithProxyEnvIfNeeded } = require('../src/lib/proxy-env');
+const { migrateTrackerRoot } = require('../src/lib/tracker-paths');
 
 const { argv, debug } = stripDebugFlag(process.argv.slice(2));
 if (debug) process.env.TOKENTRACKER_DEBUG = '1';
@@ -21,7 +22,13 @@ if (relaunch) {
   process.exit(0);
 }
 
-run(argv).catch((err) => {
+(async () => {
+  await migrateTrackerRoot().catch((err) => {
+    console.error(`Tracker data migration warning: ${err?.message || err}`);
+  });
+
+  await run(argv);
+})().catch((err) => {
   console.error(err?.stack || String(err));
   if (debug) {
     if (typeof err?.status === 'number') {

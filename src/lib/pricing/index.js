@@ -6,6 +6,7 @@
 const fs = require("node:fs");
 const path = require("node:path");
 const os = require("node:os");
+const { resolveTrackerRootDir } = require("../tracker-paths");
 
 const curatedOverrides = require("./curated-overrides.json");
 const {
@@ -46,7 +47,7 @@ const state = {
 };
 
 function defaultCachePath() {
-  return path.join(os.homedir(), ".tokentracker", "cache", "pricing.json");
+  return path.join(resolveTrackerRootDir(os.homedir()), "cache", "pricing.json");
 }
 
 async function ensurePricingLoaded(opts = {}) {

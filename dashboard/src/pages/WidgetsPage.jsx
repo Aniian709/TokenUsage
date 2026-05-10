@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { ArrowUpRight, ChevronDown, Download, Monitor, Pin, SlidersHorizontal } from "lucide-react";
+import { ArrowUpRight, ChevronDown, Download, Minus, Monitor, Pin, Plus, SlidersHorizontal, Sparkles, Wand2 } from "lucide-react";
 import { copy } from "../lib/copy";
 import { cn } from "../lib/cn";
 import { isNativeEmbed, nativeAction } from "../lib/native-bridge.js";
@@ -8,9 +8,17 @@ import {
   FALLBACK_MENU_BAR_ITEMS,
   normalizeMenuBarItems,
 } from "../lib/menu-bar-display.js";
-import { ToggleSwitch } from "../components/settings/Controls.jsx";
+import { SegmentedControl, ToggleSwitch } from "../components/settings/Controls.jsx";
 import { getOverlayConfig, saveOverlayConfig } from "../lib/widget-overlays";
 import { FadeIn, StaggerContainer, StaggerItem } from "../ui/foundation/FadeIn.jsx";
+import { ClawdAnimated } from "../ui/foundation/ClawdAnimated.jsx";
+import {
+  CLAWD_SELECTABLE_STATES,
+  createMenuBarAutoStage,
+  formatClawdStateLabel,
+  normalizeMenuBarClawdConfig,
+  resolveMenuBarClawdState,
+} from "../lib/clawd-animations.js";
 
 /* ---------- SVG widget illustrations ----------
  * Hand-drawn previews of the real macOS widgets. Pure SVG so they stay
@@ -304,7 +312,7 @@ function fillTwoSlots(ids, availableItems) {
  * Dark pill on a neutral wallpaper-style backdrop. When `showStats` is off,
  * only the icon is shown (matches the native fallback behavior).
  */
-function MenuBarPreview({ slotConfigs, showStats }) {
+function MenuBarPreview({ slotConfigs, showStats, animatedIcon, clawdState }) {
   return (
     <div className="flex justify-center rounded-xl bg-gradient-to-b from-oai-gray-100 to-oai-gray-200 px-6 py-8 dark:from-oai-gray-950/80 dark:to-oai-gray-900/80">
       <div
@@ -316,14 +324,22 @@ function MenuBarPreview({ slotConfigs, showStats }) {
             between them. Character is sized to read like a real macOS
             menu-bar glyph rather than a hero illustration. */}
         <div className="flex items-center pl-2 pr-1 py-2.5">
-          <img
-            src="/clawd/mini/idle-tight.svg"
-            alt=""
-            aria-hidden="true"
-            className="block shrink-0"
-            style={{ height: 22, width: "auto" }}
-            draggable="false"
-          />
+          {animatedIcon ? (
+            <ClawdAnimated
+              state={clawdState}
+              size={32}
+              className="shrink-0"
+            />
+          ) : (
+            <img
+              src="/clawd/mini/idle-tight.svg"
+              alt=""
+              aria-hidden="true"
+              className="block shrink-0"
+              style={{ height: 22, width: "auto" }}
+              draggable="false"
+            />
+          )}
         </div>
         {showStats
           ? slotConfigs.map(({ slot, item }, idx) => (
@@ -399,6 +415,135 @@ function MenuBarToggleRow({ label, hint, checked, disabled, onChange }) {
   );
 }
 
+function ClawdStateSelect({ label, hint, value, disabled, onChange }) {
+  return (
+    <label className="flex min-w-0 flex-col gap-1.5">
+      <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-oai-gray-500 dark:text-oai-gray-400">
+        {label}
+      </span>
+      {hint ? (
+        <span className="text-xs text-oai-gray-500 dark:text-oai-gray-400">{hint}</span>
+      ) : null}
+      <div className="relative">
+        <select
+          value={value}
+          disabled={disabled}
+          aria-label={label}
+          onChange={(event) => onChange(event.target.value)}
+          className={cn(
+            "w-full appearance-none rounded-lg border border-oai-gray-200 bg-white px-3 py-2 pr-9 text-sm font-medium text-oai-black transition-colors hover:border-oai-gray-300 dark:border-oai-gray-800 dark:bg-oai-gray-900 dark:text-white dark:hover:border-oai-gray-700",
+            disabled && "cursor-not-allowed opacity-50 hover:border-oai-gray-200 dark:hover:border-oai-gray-800",
+          )}
+        >
+          {CLAWD_SELECTABLE_STATES.map((state) => (
+            <option key={state} value={state}>
+              {formatClawdStateLabel(state)}
+            </option>
+          ))}
+        </select>
+        <ChevronDown
+          className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-oai-gray-400"
+          aria-hidden="true"
+        />
+      </div>
+    </label>
+  );
+}
+
+function RangeNumberInput({
+  label,
+  value,
+  disabled,
+  onChange,
+  placeholder,
+  onBlur,
+  onKeyDown,
+}) {
+  return (
+    <label className="flex min-w-0 flex-col gap-1.5">
+      <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-oai-gray-500 dark:text-oai-gray-400">
+        {label}
+      </span>
+      <div className="relative">
+        <input
+        type="number"
+        value={value ?? ""}
+        disabled={disabled}
+        placeholder={placeholder}
+        onChange={(event) => {
+          const raw = event.target.value.trim();
+          onChange(raw === "" ? null : Number(raw));
+        }}
+        onBlur={onBlur}
+        onKeyDown={onKeyDown}
+        className={cn(
+          "w-full rounded-lg border border-oai-gray-200 bg-white px-3 py-2 pr-8 text-sm font-medium text-oai-black transition-colors hover:border-oai-gray-300 dark:border-oai-gray-800 dark:bg-oai-gray-900 dark:text-white dark:hover:border-oai-gray-700",
+          disabled && "cursor-not-allowed opacity-50 hover:border-oai-gray-200 dark:hover:border-oai-gray-800",
+        )}
+        />
+        <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-xs font-semibold text-oai-gray-500 dark:text-oai-gray-400">
+          M
+        </span>
+      </div>
+    </label>
+  );
+}
+
+function RangeDisplay({ label, value, placeholder = "—" }) {
+  return (
+    <div className="flex min-w-0 flex-col gap-1.5">
+      <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-oai-gray-500 dark:text-oai-gray-400">
+        {label}
+      </span>
+      <div className="relative">
+        <div className="w-full rounded-lg border border-oai-gray-200 bg-oai-gray-50 px-3 py-2 pr-8 text-sm font-medium text-oai-gray-500 dark:border-oai-gray-800 dark:bg-oai-gray-950/60 dark:text-oai-gray-300">
+          {value ?? placeholder}
+        </div>
+        <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-xs font-semibold text-oai-gray-500 dark:text-oai-gray-400">
+          M
+        </span>
+      </div>
+    </div>
+  );
+}
+
+function ClawdPreviewGrid({ selectedState, onSelect, interactive = true }) {
+  return (
+    <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-4">
+      {CLAWD_SELECTABLE_STATES.map((state) => {
+        const active = state === selectedState;
+        return (
+          <button
+            key={state}
+            type="button"
+            onClick={() => {
+              if (interactive && onSelect) onSelect(state);
+            }}
+            disabled={!interactive}
+            className={cn(
+              "flex flex-col items-center rounded-xl border px-3 py-4 text-center transition-colors",
+              active
+                ? "border-oai-brand-500 bg-oai-brand-50 dark:bg-oai-brand-500/10"
+                : "border-oai-gray-200 bg-oai-gray-50 hover:border-oai-gray-300 dark:border-oai-gray-800 dark:bg-oai-gray-950/60 dark:hover:border-oai-gray-700",
+              !interactive && "cursor-default",
+            )}
+          >
+            <div className="flex h-24 w-full items-center justify-center overflow-hidden rounded-lg bg-white dark:bg-oai-gray-900">
+              <ClawdAnimated state={state} size={88} crop={false} />
+            </div>
+            <span className="mt-3 text-sm font-semibold text-oai-black dark:text-white">
+              {formatClawdStateLabel(state)}
+            </span>
+            <span className="mt-1 text-xs text-oai-gray-500 dark:text-oai-gray-400">
+              {state}
+            </span>
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
 function useOverlayController() {
   const [config, setConfig] = useState(null);
   const [saving, setSaving] = useState(false);
@@ -431,6 +576,10 @@ function useOverlayController() {
 function MenuBarDisplayCard({ overlayConfig, overlaySaving, onSaveOverlayConfig }) {
   const { available, settings, setSetting } = useNativeSettings();
   const localMenuBar = overlayConfig?.menuBar || {};
+  const clawdConfig = useMemo(
+    () => normalizeMenuBarClawdConfig(available ? settings?.menuBarClawd : localMenuBar.clawd),
+    [available, localMenuBar.clawd, settings?.menuBarClawd],
+  );
 
   const availableItems = useMemo(() => {
     const nativeItems = Array.isArray(settings?.menuBarAvailableItems)
@@ -459,6 +608,24 @@ function MenuBarDisplayCard({ overlayConfig, overlaySaving, onSaveOverlayConfig 
     ? settings?.animatedIcon !== false
     : localMenuBar.animatedIcon !== false;
   const menuBarEnabled = Boolean(overlayConfig?.windows?.menubar?.enabled);
+  const previewTodayTokens = 203_000_000;
+  const [rangeDrafts, setRangeDrafts] = useState({});
+  const previewClawdState = resolveMenuBarClawdState({
+    todayTokens: previewTodayTokens,
+    config: clawdConfig,
+  });
+
+  useEffect(() => {
+    if (clawdConfig.mode !== "auto") return;
+    setRangeDrafts(
+      Object.fromEntries(
+        clawdConfig.autoStages.map((stage) => {
+          const value = Number.isFinite(stage.max) ? Number(stage.max) / 1_000_000 : null;
+          return [stage.id, value == null ? "" : String(value)];
+        }),
+      ),
+    );
+  }, [clawdConfig.autoStages, clawdConfig.mode]);
 
   const saveSelection = (ids) => {
     const normalized = normalizeMenuBarItems(ids, availableItems, maxItems);
@@ -484,6 +651,93 @@ function MenuBarDisplayCard({ overlayConfig, overlaySaving, onSaveOverlayConfig 
     saveSelection(next);
   };
 
+  const saveClawdConfig = (nextConfig) => {
+    const normalized = normalizeMenuBarClawdConfig(nextConfig);
+    if (available) {
+      setSetting("menuBarClawd", normalized);
+      return;
+    }
+    if (!overlayConfig) return;
+    onSaveOverlayConfig({
+      ...overlayConfig,
+      menuBar: {
+        ...overlayConfig.menuBar,
+        clawd: normalized,
+      },
+    });
+  };
+
+  const saveAutoStageMax = (stageIndex, nextMaxMillion) => {
+    const normalizedNumber =
+      nextMaxMillion == null || Number.isNaN(nextMaxMillion) ? null : Number(nextMaxMillion);
+    const nextStages = clawdConfig.autoStages.map((stage) => ({ ...stage }));
+
+    let currentMin = 0;
+    nextStages.forEach((stage, index) => {
+      let max = stage.max;
+      if (index === stageIndex) {
+        max = normalizedNumber == null ? null : Math.max(currentMin, Math.round(normalizedNumber * 1_000_000));
+      }
+      if (index < nextStages.length - 1) {
+        if (!Number.isFinite(max)) {
+          max = currentMin;
+        }
+      } else {
+        max = normalizedNumber == null ? null : Math.max(currentMin, Math.round(normalizedNumber * 1_000_000));
+      }
+
+      stage.min = currentMin;
+      stage.max = max;
+      currentMin = Number.isFinite(max) ? Number(max) : currentMin;
+    });
+
+    for (let index = 1; index < nextStages.length; index += 1) {
+      const prevMax = nextStages[index - 1].max;
+      nextStages[index].min = Number.isFinite(prevMax) ? Number(prevMax) : nextStages[index].min;
+      if (Number.isFinite(nextStages[index].max) && nextStages[index].max < nextStages[index].min) {
+        nextStages[index].max = nextStages[index].min;
+      }
+    }
+
+    saveClawdConfig({
+      ...clawdConfig,
+      autoStages: nextStages,
+    });
+  };
+
+  const addAutoStage = () => {
+    const previousStage = clawdConfig.autoStages[clawdConfig.autoStages.length - 2] || clawdConfig.autoStages[0];
+    const lastStage = clawdConfig.autoStages[clawdConfig.autoStages.length - 1];
+    const previousMax = Number.isFinite(previousStage?.max) ? Number(previousStage.max) : 0;
+    const inserted = createMenuBarAutoStage({
+      min: previousMax,
+      max: previousMax,
+      state: previousStage?.state || "idle-living",
+    });
+    const nextStages = [
+      ...clawdConfig.autoStages.slice(0, -1),
+      inserted,
+      createMenuBarAutoStage({
+        min: previousMax,
+        max: null,
+        state: lastStage?.state || "working-ultrathink",
+      }),
+    ];
+    saveClawdConfig({
+      ...clawdConfig,
+      autoStages: nextStages,
+    });
+  };
+
+  const removeAutoStage = (stageIndex) => {
+    if (clawdConfig.autoStages.length <= 2) return;
+    const nextStages = clawdConfig.autoStages.filter((_, index) => index !== stageIndex);
+    saveClawdConfig({
+      ...clawdConfig,
+      autoStages: nextStages,
+    });
+  };
+
   const slotConfigs = [0, 1].map((slot) => {
     const currentValue = slotIds[slot] || availableItems[slot]?.id || "";
     const otherSlot = slot === 0 ? 1 : 0;
@@ -497,7 +751,12 @@ function MenuBarDisplayCard({ overlayConfig, overlaySaving, onSaveOverlayConfig 
 
   return (
     <article className="rounded-xl border border-oai-gray-200 bg-white p-5 transition-colors duration-200 dark:border-oai-gray-800 dark:bg-oai-gray-900 sm:p-6">
-      <MenuBarPreview slotConfigs={slotConfigs} showStats={showStats} />
+      <MenuBarPreview
+        slotConfigs={slotConfigs}
+        showStats={showStats}
+        animatedIcon={animatedIcon}
+        clawdState={previewClawdState}
+      />
 
       <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4">
         {slotConfigs.map(({ slot, currentValue, options }) => (
@@ -511,6 +770,137 @@ function MenuBarDisplayCard({ overlayConfig, overlaySaving, onSaveOverlayConfig 
           />
         ))}
       </div>
+
+      {animatedIcon ? (
+        <div className="mt-5 rounded-xl border border-oai-gray-100 bg-oai-gray-50/70 p-4 dark:border-oai-gray-800 dark:bg-oai-gray-950/50">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <p className="text-sm font-medium text-oai-black dark:text-white">动画模式</p>
+              <p className="mt-0.5 text-xs text-oai-gray-500 dark:text-oai-gray-400">
+                自动模式按原先的 todayTokens 分档触发；手动模式固定使用你选择的动画。
+              </p>
+            </div>
+            <SegmentedControl
+              options={[
+                { value: "auto", label: "自动", Icon: Sparkles },
+                { value: "manual", label: "手动", Icon: Wand2 },
+              ]}
+              value={clawdConfig.mode}
+              onChange={(mode) => saveClawdConfig({ ...clawdConfig, mode })}
+            />
+          </div>
+
+          {clawdConfig.mode === "manual" ? (
+            <div className="mt-4 space-y-4">
+              <ClawdStateSelect
+                label="手动动画"
+                hint="菜单栏会固定显示这个动画。"
+                value={clawdConfig.manualState}
+                disabled={overlaySaving || (!available && !overlayConfig)}
+                onChange={(manualState) => saveClawdConfig({ ...clawdConfig, manualState })}
+              />
+              <ClawdPreviewGrid
+                selectedState={clawdConfig.manualState}
+                onSelect={(manualState) => saveClawdConfig({ ...clawdConfig, manualState })}
+              />
+            </div>
+          ) : (
+            <div className="mt-4 space-y-4">
+              <div className="rounded-xl border border-oai-gray-200 bg-white p-3 dark:border-oai-gray-800 dark:bg-oai-gray-900">
+                <p className="text-xs font-semibold uppercase tracking-[0.08em] text-oai-gray-500 dark:text-oai-gray-400">
+                  自动模式当前预览
+                </p>
+                <p className="mt-1 text-sm font-medium text-oai-black dark:text-white">
+                  以 todayTokens = {previewTodayTokens.toLocaleString()} 预览，当前会触发 {formatClawdStateLabel(previewClawdState)}
+                </p>
+              </div>
+              <div className="flex justify-end">
+                <button
+                  type="button"
+                  onClick={addAutoStage}
+                  className="inline-flex items-center gap-2 rounded-lg border border-oai-gray-200 bg-white px-3 py-2 text-sm font-medium text-oai-black transition-colors hover:border-oai-gray-300 dark:border-oai-gray-800 dark:bg-oai-gray-900 dark:text-white dark:hover:border-oai-gray-700"
+                >
+                  <Plus className="h-4 w-4" aria-hidden="true" />
+                  Add Stage
+                </button>
+              </div>
+              <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
+                {clawdConfig.autoStages.map((stage, index) => {
+                  const maxDraft = rangeDrafts[stage.id] ?? (Number.isFinite(stage.max) ? String(Number(stage.max) / 1_000_000) : "");
+                  return (
+                    <div
+                      key={stage.id}
+                      className="rounded-xl border border-oai-gray-200 bg-white p-3 dark:border-oai-gray-800 dark:bg-oai-gray-900"
+                    >
+                      <div className="mb-3 flex items-start justify-between gap-3">
+                        <div>
+                          <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-oai-gray-500 dark:text-oai-gray-400">
+                            {`Stage ${index + 1}`}
+                          </p>
+                          <p className="mt-1 text-xs text-oai-gray-500 dark:text-oai-gray-400">
+                            todayTokens stage {index + 1}
+                          </p>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => removeAutoStage(index)}
+                          disabled={clawdConfig.autoStages.length <= 2}
+                          className="inline-flex items-center gap-1 rounded-md border border-oai-gray-200 px-2 py-1 text-xs font-medium text-oai-gray-500 transition-colors hover:border-oai-gray-300 hover:text-oai-black disabled:cursor-not-allowed disabled:opacity-40 dark:border-oai-gray-800 dark:text-oai-gray-400 dark:hover:border-oai-gray-700 dark:hover:text-white"
+                        >
+                          <Minus className="h-3.5 w-3.5" aria-hidden="true" />
+                          Remove
+                        </button>
+                      </div>
+                      <ClawdStateSelect
+                        label="Animation"
+                        value={stage.state}
+                        disabled={overlaySaving || (!available && !overlayConfig)}
+                        onChange={(value) =>
+                          saveClawdConfig({
+                            ...clawdConfig,
+                            autoStages: clawdConfig.autoStages.map((entry, entryIndex) =>
+                              entryIndex === index ? { ...entry, state: value } : entry,
+                            ),
+                          })}
+                      />
+                      <div className="mt-3 grid grid-cols-2 gap-3">
+                        <RangeDisplay
+                          label="Min"
+                          value={Number.isFinite(stage.min) ? Number(stage.min) / 1_000_000 : 0}
+                        />
+                        <RangeNumberInput
+                          label="Max"
+                          value={maxDraft}
+                          disabled={overlaySaving || (!available && !overlayConfig)}
+                          placeholder="留空表示无上限"
+                          onChange={(max) =>
+                            setRangeDrafts((prev) => ({
+                              ...prev,
+                              [stage.id]: max == null ? "" : String(max),
+                            }))}
+                          onBlur={() => {
+                            const raw = String(rangeDrafts[stage.id] ?? "").trim();
+                            saveAutoStageMax(index, raw === "" ? null : Number(raw));
+                          }}
+                          onKeyDown={(event) => {
+                            if (event.key === "Enter") {
+                              event.currentTarget.blur();
+                            }
+                          }}
+                        />
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+              <ClawdPreviewGrid
+                selectedState={previewClawdState}
+                interactive={false}
+              />
+            </div>
+          )}
+        </div>
+      ) : null}
 
       <div className="mt-5 divide-y divide-oai-gray-100 border-t border-oai-gray-100 dark:divide-oai-gray-800 dark:border-oai-gray-800">
         <MenuBarToggleRow
@@ -772,7 +1162,7 @@ function DesktopOverlayCard({ config, saving, onSaveOverlayConfig }) {
             </span>
             <input
               type="range"
-              min="0.325"
+              min="0.1625"
               max="1"
               step="0.025"
               value={config?.appearance?.opacity ?? 1}

@@ -1,6 +1,7 @@
 const fs = require("node:fs/promises");
 const os = require("node:os");
 const path = require("node:path");
+const { resolveTrackerRootDir } = require("./tracker-paths");
 
 const TOKEN_FIELDS = [
   "input_tokens",
@@ -501,7 +502,7 @@ async function writeSnapshot(homeDir, snapshot) {
 }
 
 function resolveSnapshotPath(homeDir) {
-  return path.join(homeDir, ".tokentracker", "cache", "session-history-cache.json");
+  return path.join(resolveTrackerRootDir(homeDir), "cache", "session-history-cache.json");
 }
 
 async function safeStat(filePath) {

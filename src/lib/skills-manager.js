@@ -1,6 +1,7 @@
 const fs = require("node:fs");
 const os = require("node:os");
 const path = require("node:path");
+const { resolveTrackerRootDir } = require("./tracker-paths");
 
 const DEFAULT_REPOS = [
   { owner: "anthropics", name: "skills", branch: "main", enabled: true },
@@ -48,7 +49,7 @@ async function mapWithConcurrency(items, limit, worker) {
 }
 
 function dataDir() {
-  return path.join(os.homedir(), ".tokentracker", "skills");
+  return path.join(resolveTrackerRootDir(os.homedir()), "skills");
 }
 
 function registryPath() {

@@ -16,6 +16,16 @@ export type OverlayConfig = {
     scale: number;
     clickThrough: boolean;
   };
+  menuBar?: {
+    items?: string[];
+    showStats?: boolean;
+    animatedIcon?: boolean;
+    clawd?: {
+      mode?: "auto" | "manual";
+      manualState?: string;
+      autoStates?: Record<string, string>;
+    };
+  };
 };
 
 export async function getOverlayConfig(fetchImpl: typeof fetch = fetch): Promise<OverlayConfig> {

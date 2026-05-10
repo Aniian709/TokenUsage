@@ -35,14 +35,14 @@ const {
   stopOverlayHost,
   normalizeOverlayConfig,
 } = require("./widget-overlays");
+const { resolveTrackerRootDir } = require("./tracker-paths");
 
 // ---------------------------------------------------------------------------
 // Queue data helpers
 // ---------------------------------------------------------------------------
 
 function resolveQueuePath() {
-  const home = os.homedir();
-  return path.join(home, ".tokentracker", "tracker", "queue.jsonl");
+  return path.join(resolveTrackerRootDir(os.homedir()), "tracker", "queue.jsonl");
 }
 
 function readProjectQueueData(projectQueuePath) {
@@ -564,7 +564,7 @@ function createLocalApiHandler({ queuePath }) {
   // Persisted to disk so cookies survive server restarts.
   let relayCookies = new Map();
   const localAuthToken = crypto.randomBytes(24).toString("hex");
-  const trackerDataDir = path.join(os.homedir(), ".tokentracker", "tracker");
+  const trackerDataDir = path.join(resolveTrackerRootDir(os.homedir()), "tracker");
   const cookiePath = path.join(trackerDataDir, "relay-cookies.json");
 
   // Load persisted cookies on startup

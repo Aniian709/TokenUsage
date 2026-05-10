@@ -4,6 +4,9 @@
   "description": "Local token usage dashboard for Codex and Claude Code on Windows, with desktop widgets and persisted history.",
   "main": "src/cli.js",
   "bin": {
+    "tokenusage": "bin/tracker.js",
+    "tokenusage-cli": "bin/tracker.js",
+    "tokenusage-tracker": "bin/tracker.js",
     "tokentracker-cli": "bin/tracker.js",
     "tracker": "bin/tracker.js",
     "tokentracker": "bin/tracker.js",

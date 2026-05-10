@@ -161,7 +161,7 @@ async function cmdInit(argv) {
   renderLocalSuccess();
 
   try {
-    spawnInitSync({ trackerBinPath, packageName: "tokentracker" });
+    spawnInitSync({ trackerBinPath, packageName: "tokenusage" });
   } catch (err) {
     const msg = err && err.message ? err.message : "unknown error";
     process.stderr.write(`Initial sync spawn failed: ${msg}\n`);
@@ -173,7 +173,7 @@ function renderWelcome() {
     [
       ASCII_LOGO,
       "",
-      `${BOLD}Welcome to Token Tracker${RESET}`,
+      `${BOLD}Welcome to TokenUsage${RESET}`,
       DIVIDER,
       `${CYAN}Privacy First: Your data stays local. Only token counts are tracked — never prompts or responses.${RESET}`,
       DIVIDER,
@@ -272,7 +272,7 @@ async function runSetup({
 
   await writeFileAtomic(
     notifyPath,
-    buildNotifyHandler({ trackerDir, trackerBinPath, packageName: "tokentracker-cli" }),
+    buildNotifyHandler({ trackerDir, trackerBinPath, packageName: "tokenusage-cli" }),
   );
   await fs.chmod(notifyPath, 0o755).catch(() => {});
 
@@ -469,7 +469,7 @@ async function applyIntegrationSetup({ home, trackerDir, notifyPath, notifyOrigi
   const openclawInstall = await installOpenclawSessionPlugin({
     home,
     trackerDir,
-    packageName: "tokentracker-cli",
+    packageName: "tokenusage-cli",
     env: process.env,
   });
   if (openclawInstall?.skippedReason === "openclaw-cli-missing") {
@@ -732,7 +732,7 @@ function buildNotifyHandler({ trackerDir, packageName }) {
   // It must never block Codex; it spawns sync in the background and exits 0.
   const queueSignalPath = path.join(trackerDir, "notify.signal");
   const originalPath = path.join(trackerDir, "codex_notify_original.json");
-  const fallbackPkg = packageName || "tokentracker-cli";
+  const fallbackPkg = packageName || "tokenusage-cli";
   const trackerBinPath = path.join(trackerDir, "app", "bin", "tracker.js");
 
   return `#!/usr/bin/env node
@@ -975,7 +975,7 @@ async function safeRealpath(p) {
 }
 
 function spawnInitSync({ trackerBinPath, packageName }) {
-  const fallbackPkg = packageName || "tokentracker-cli";
+  const fallbackPkg = packageName || "tokenusage-cli";
   const argv = ["sync", "--drain"];
   const hasLocalRuntime = typeof trackerBinPath === "string" && fssync.existsSync(trackerBinPath);
   const cmd = hasLocalRuntime
@@ -990,7 +990,7 @@ function spawnInitSync({ trackerBinPath, packageName }) {
     const msg = err && err.message ? err.message : "unknown error";
     const detail = isDebugEnabled() ? ` (${msg})` : "";
     process.stderr.write(`Minor issue: Background sync could not start${detail}.\n`);
-    process.stderr.write("Run: npx --yes tokentracker-cli sync\n");
+    process.stderr.write("Run: npx --yes tokenusage sync\n");
   });
   child.unref();
 }

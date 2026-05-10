@@ -15,7 +15,10 @@ import {
 import { getOverlayConfig } from "../lib/widget-overlays";
 import { buildTopModels } from "../lib/model-breakdown";
 import { ClawdAnimated } from "../ui/foundation/ClawdAnimated.jsx";
-import { useClawdState } from "../hooks/useClawdState.js";
+import {
+  getMenuBarClawdPresentation,
+  resolveMenuBarClawdState,
+} from "../lib/clawd-animations.js";
 
 const MODEL_COLORS = ["#5A8CF2", "#9973E6", "#4DB8A6", "#E68C59"];
 const SOURCE_COLORS = {
@@ -158,7 +161,7 @@ function useOverlayAppearance() {
 }
 
 function widgetSurfaceStyle(kind, opacity) {
-  const clamped = Number.isFinite(opacity) ? Math.max(0.09, Math.min(1, opacity)) : 1;
+  const clamped = Number.isFinite(opacity) ? Math.max(0.045, Math.min(1, opacity)) : 1;
   if (kind === "menubar") {
     return {
       border: `1px solid rgba(255,255,255,${0.1 * clamped + 0.04})`,
@@ -525,6 +528,7 @@ function MenuBarWidgetHost() {
   const summary = useSummaryData();
   const [overlayConfig, setOverlayConfig] = useState(null);
   const [limits, setLimits] = useState(null);
+  const [clawdMeasure, setClawdMeasure] = useState(null);
 
   useWidgetClock(
     5000,
@@ -566,24 +570,44 @@ function MenuBarWidgetHost() {
   const displayItems = Array.isArray(menuBar.items) && menuBar.items.length > 0
     ? menuBar.items.slice(0, 2)
     : ["todayTokens", "todayCost"];
-  const clawdState = useClawdState({
+  const clawdState = resolveMenuBarClawdState({
     todayTokens: Number(summary.today?.billable_total_tokens ?? summary.today?.total_tokens ?? 0),
     isSyncing: false,
     hasError: false,
     isDisconnected: false,
+    config: menuBar.clawd,
   });
+  const clawdPresentation = getMenuBarClawdPresentation(clawdState);
+  const adaptiveScale = useMemo(() => {
+    const widthRatio = Number(clawdMeasure?.contentWidthRatio || 1);
+    const heightRatio = Number(clawdMeasure?.contentHeightRatio || 1);
+    const occupancy = Math.max(widthRatio, heightRatio);
+    if (!Number.isFinite(occupancy) || occupancy <= 0) return 1;
+    const fitBoost = Math.min(1.45, Math.max(1, 0.84 / occupancy));
+    return fitBoost;
+  }, [clawdMeasure]);
 
   return (
     <WidgetShell kind="menubar" appearanceOpacity={appearance.opacity}>
-      <div className="flex h-full items-center justify-center px-[6px] text-white">
+      <div className="flex h-full items-center justify-center px-[8px] text-white">
         <div className="inline-flex items-stretch">
           <div className="flex items-center pl-[2px] pr-[9px]">
             {menuBar.animatedIcon ? (
-              <ClawdAnimated
-                state={clawdState}
-                size={52}
-                className="shrink-0"
-              />
+              <div
+                className="flex h-[44px] w-[62px] items-center justify-center overflow-hidden"
+                style={{
+                  transform: `translate(${clawdPresentation.offsetX}px, ${clawdPresentation.offsetY}px) scale(${clawdPresentation.scale * adaptiveScale})`,
+                  transformOrigin: "center center",
+                }}
+              >
+                <ClawdAnimated
+                  state={clawdState}
+                  size={clawdPresentation.size}
+                  cropPadding={clawdPresentation.cropPadding}
+                  onMeasure={setClawdMeasure}
+                  className="shrink-0"
+                />
+              </div>
             ) : (
               <img
                 src="/clawd/mini/idle-tight.svg"
@@ -606,7 +630,7 @@ function MenuBarWidgetHost() {
                       className={
                         index === 0
                           ? "flex min-w-[50px] flex-col items-center justify-center pb-[7px] pt-[8px] pr-[2px]"
-                          : "flex min-w-[50px] flex-col items-center justify-center pb-[7px] pt-[8px] pl-[1px]"
+                          : "flex min-w-[54px] flex-col items-center justify-center pb-[7px] pt-[8px] pl-[1px] pr-[3px]"
                       }
                     >
                       <div className="text-[15px] font-bold leading-none text-white">{item.value}</div>
