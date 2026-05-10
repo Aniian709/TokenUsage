@@ -138,7 +138,7 @@ export function MarketingLanding({
             >
               <img src="/app-icon.png" alt="" width={24} height={24} className="rounded-md" />
               <span className="text-sm font-semibold tracking-wide text-white uppercase">
-                Token Tracker
+                TokenUsage
               </span>
             </Link>
             <div className="hidden sm:block">
@@ -218,7 +218,7 @@ export function MarketingLanding({
                         <code className="font-mono text-sm text-oai-gray-200 overflow-x-auto whitespace-nowrap py-2 [scrollbar-width:none]">
                           {installCommand ? installCommand.split(' ').map((part, i) => (
                             <span key={i} className={
-                              part === 'npx' || part === 'tokentracker-cli'
+                              part === 'npx' || part === 'tokenusage-cli'
                                 ? 'text-white font-medium'
                                 : part === '--yes'
                                   ? 'text-oai-gray-500'

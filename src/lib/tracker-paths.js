@@ -8,7 +8,7 @@ function resolveTrackerRootDir(home = os.homedir()) {
 }
 
 function resolveLegacyTrackerRootDir(home = os.homedir()) {
-  return path.join(home, ".tokentracker");
+  return path.join(home, ".tokenusage");
 }
 
 async function pathExists(targetPath) {

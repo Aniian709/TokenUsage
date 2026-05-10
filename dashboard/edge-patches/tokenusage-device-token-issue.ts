@@ -1,13 +1,13 @@
 /**
- * InsForge Edge：为当前登录用户签发 device token（写入 tokentracker_devices / tokentracker_device_tokens）。
- * 与文档中 historical 名称 vibeusage-device-token-issue 不同：本项目云端 slug 为 tokentracker-device-token-issue。
+ * InsForge Edge：为当前登录用户签发 device token（写入 tokenusage_devices / tokenusage_device_tokens）。
+ * 与文档中 historical 名称 vibeusage-device-token-issue 不同：本项目云端 slug 为 tokenusage-device-token-issue。
  */
 import { createClient } from "npm:@insforge/sdk";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
-  "Access-Control-Allow-Headers": "Content-Type, Authorization, apikey, x-tokentracker-device-token-hash",
+  "Access-Control-Allow-Headers": "Content-Type, Authorization, apikey, x-tokenusage-device-token-hash",
 };
 
 function json(data: unknown, status = 200) {
@@ -139,7 +139,7 @@ export default async function (req: Request): Promise<Response> {
     });
   }
 
-  const deviceName = String(body.device_name ?? (body.data as Record<string, unknown> | undefined)?.device_name ?? "Token Tracker")
+  const deviceName = String(body.device_name ?? (body.data as Record<string, unknown> | undefined)?.device_name ?? "TokenUsage")
     .slice(0, 128);
   const platform = String(body.platform ?? (body.data as Record<string, unknown> | undefined)?.platform ?? "web").slice(
     0,
@@ -150,19 +150,19 @@ export default async function (req: Request): Promise<Response> {
   // instead of minting a fresh one on every issue. Client localStorage is
   // isolated across Safari / Chrome / WKWebView, so the client asks for a new
   // token on every environment — if we created a fresh device_id each time,
-  // `tokentracker_hourly` ends up with the same logical bucket written under
+  // `tokenusage_hourly` ends up with the same logical bucket written under
   // many device_ids, and leaderboard SUM would double-count. Keeping a single
   // device_id per logical device means every sync upserts onto the same row.
   //
   // Concurrency: two parallel calls (tab + webview on first login) must not
   // each INSERT a fresh row. The partial unique index
-  // `tokentracker_devices_active_unique` on (user_id, platform, device_name)
+  // `tokenusage_devices_active_unique` on (user_id, platform, device_name)
   // WHERE revoked_at IS NULL guarantees one active row per logical device.
   // We INSERT with ON CONFLICT DO NOTHING; if the insert loses the race it
   // returns zero rows, and we SELECT to get the winner's id.
   const newDeviceId = crypto.randomUUID();
   const { data: insertedDevice } = await dbClient.database
-    .from("tokentracker_devices")
+    .from("tokenusage_devices")
     .insert([{ id: newDeviceId, user_id: userId, device_name: deviceName, platform }], {
       onConflict: "user_id,platform,device_name",
       ignoreDuplicates: true,
@@ -174,7 +174,7 @@ export default async function (req: Request): Promise<Response> {
     deviceId = (insertedDevice[0] as { id: string }).id;
   } else {
     const { data: winner, error: lookupErr } = await dbClient.database
-      .from("tokentracker_devices")
+      .from("tokenusage_devices")
       .select("id")
       .eq("user_id", userId)
       .eq("platform", platform)
@@ -199,7 +199,7 @@ export default async function (req: Request): Promise<Response> {
   const createdAt = new Date().toISOString();
 
   const { error: revokeErr } = await dbClient.database
-    .from("tokentracker_device_tokens")
+    .from("tokenusage_device_tokens")
     .update({ revoked_at: createdAt })
     .eq("device_id", deviceId)
     .is("revoked_at", null);
@@ -208,7 +208,7 @@ export default async function (req: Request): Promise<Response> {
     return json({ error: "Failed to rotate device token", detail: revokeErr.message }, 500);
   }
 
-  const { error: tokenErr } = await dbClient.database.from("tokentracker_device_tokens").insert([
+  const { error: tokenErr } = await dbClient.database.from("tokenusage_device_tokens").insert([
     {
       id: tokenId,
       device_id: deviceId,

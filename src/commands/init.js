@@ -415,7 +415,7 @@ async function applyIntegrationSetup({ home, trackerDir, notifyPath, notifyOrigi
   }
 
   // Kimi: passive reader — no hook installation needed.
-  // TokenTracker reads ~/.kimi/sessions/**/wire.jsonl directly.
+  // TokenUsage reads ~/.kimi/sessions/**/wire.jsonl directly.
   {
     const kimiHome = process.env.KIMI_HOME || path.join(home, ".kimi");
     const kimiSessions = path.join(kimiHome, "sessions");
@@ -426,7 +426,7 @@ async function applyIntegrationSetup({ home, trackerDir, notifyPath, notifyOrigi
   }
 
   // oh-my-pi: passive reader — no hook installation needed.
-  // TokenTracker reads ~/.omp/agent/sessions/**/*.jsonl directly.
+  // TokenUsage reads ~/.omp/agent/sessions/**/*.jsonl directly.
   {
     const ompHome = process.env.OMP_HOME ||
       (process.env.PI_CONFIG_DIR ? path.join(home, process.env.PI_CONFIG_DIR) : path.join(home, ".omp"));
@@ -438,7 +438,7 @@ async function applyIntegrationSetup({ home, trackerDir, notifyPath, notifyOrigi
   }
 
   // Craft Agents: passive reader — no hook installation needed.
-  // TokenTracker reads ~/.craft-agent/workspaces/<id>/sessions/**/session.jsonl
+  // TokenUsage reads ~/.craft-agent/workspaces/<id>/sessions/**/session.jsonl
   // (and any user-relocated workspace listed in ~/.craft-agent/config.json).
   {
     const craftConfigDir = process.env.CRAFT_CONFIG_DIR || path.join(home, ".craft-agent");
@@ -926,7 +926,7 @@ async function isDir(p) {
 }
 
 async function installLocalTrackerApp({ appDir }) {
-  // Copy the current package's runtime (bin + src) into ~/.tokentracker so notify can run sync without npx.
+  // Copy the current package's runtime (bin + src) into ~/.tokenusage so notify can run sync without npx.
   const packageRoot = path.resolve(__dirname, "../..");
   const srcFrom = path.join(packageRoot, "src");
   const binFrom = path.join(packageRoot, "bin", "tracker.js");

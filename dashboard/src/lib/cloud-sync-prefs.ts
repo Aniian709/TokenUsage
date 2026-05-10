@@ -1,6 +1,6 @@
-const KEY_ENABLED = "tokentracker_cloud_sync_enabled";
-const KEY_DEVICE = "tokentracker_cloud_device_session_v1";
-const KEY_LAST_SYNC = "tokentracker_cloud_last_sync_ts";
+const KEY_ENABLED = "tokenusage_cloud_sync_enabled";
+const KEY_DEVICE = "tokenusage_cloud_device_session_v1";
+const KEY_LAST_SYNC = "tokenusage_cloud_last_sync_ts";
 let memoryDeviceSession: CloudDeviceSession | null = null;
 
 export type CloudDeviceSession = {

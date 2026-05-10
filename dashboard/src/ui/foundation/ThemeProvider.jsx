@@ -7,7 +7,7 @@ import {
   syncNativeChromeAppearance,
 } from "../../lib/native-bridge.js";
 
-const THEME_STORAGE_KEY = "tokentracker-theme";
+const THEME_STORAGE_KEY = "tokenusage-theme";
 
 /**
  * @typedef {"light" | "dark" | "system"} Theme

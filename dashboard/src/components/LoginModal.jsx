@@ -111,7 +111,7 @@ export function LoginModal() {
     if (typeof window === "undefined") return "";
     // In the macOS app WebView, route OAuth back through /auth/callback so
     // NativeAuthCallbackPage can detect the native flag and bounce the code
-    // into the app via the tokentracker:// URL scheme. Plain web visitors
+    // into the app via the tokenusage:// URL scheme. Plain web visitors
     // can land directly on / since the SDK auto-exchanges insforge_code.
     const isNativeContext = Boolean(window.webkit?.messageHandlers?.nativeOAuth);
     return isNativeContext
@@ -209,7 +209,7 @@ export function LoginModal() {
             <div className="text-center mb-6">
               <div className="flex items-center justify-center gap-2 mb-2">
                 <img src="/app-icon.png" alt="" width={28} height={28} className="rounded-md" />
-                <span className="text-lg font-semibold text-oai-black dark:text-white">Token Tracker</span>
+                <span className="text-lg font-semibold text-oai-black dark:text-white">TokenUsage</span>
               </div>
               <p className="text-sm text-oai-gray-500">{copy("login_modal.subtitle")}</p>
             </div>

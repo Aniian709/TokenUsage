@@ -45,7 +45,7 @@ async function triggerLeaderboardRefresh(
   // every 5 min per active user blew through the 5 GB plan). Server-side
   // schedules own the slower-moving month/total snapshots.
   try {
-    await fetch(`${root}/functions/tokentracker-leaderboard-refresh`, {
+    await fetch(`${root}/functions/tokenusage-leaderboard-refresh`, {
       method: "POST",
       headers,
       body: JSON.stringify({ period: "week", source }),
@@ -54,7 +54,7 @@ async function triggerLeaderboardRefresh(
 }
 
 /**
- * 用当前登录 JWT 向 InsForge 签发 device token，供本地 `tokentracker sync` 上传到云端。
+ * 用当前登录 JWT 向 InsForge 签发 device token，供本地 `tokenusage sync` 上传到云端。
  */
 export async function issueDeviceTokenForCloud(accessToken: string): Promise<CloudDeviceSession | null> {
   const baseUrl = getInsforgeRemoteUrl();
@@ -71,12 +71,12 @@ export async function issueDeviceTokenForCloud(accessToken: string): Promise<Clo
     typeof navigator !== "undefined" && typeof navigator.platform === "string"
       ? navigator.platform
       : "web";
-  // 云端 slug 为 tokentracker-device-token-issue（历史文档里的 vibeusage-* 在本项目未部署）
-  const res = await fetch(`${root}/functions/tokentracker-device-token-issue`, {
+  // 云端 slug 为 tokenusage-device-token-issue（历史文档里的 vibeusage-* 在本项目未部署）
+  const res = await fetch(`${root}/functions/tokenusage-device-token-issue`, {
     method: "POST",
     headers,
     body: JSON.stringify({
-      device_name: "Token Tracker (dashboard)",
+      device_name: "TokenUsage (dashboard)",
       platform,
     }),
   });
@@ -98,7 +98,7 @@ export async function issueDeviceTokenForCloud(accessToken: string): Promise<Clo
 }
 
 /**
- * 触发本地 CLI `sync`（经 dev server / tokentracker serve），可选覆盖 device token 与云端 baseUrl。
+ * 触发本地 CLI `sync`（经 dev server / tokenusage serve），可选覆盖 device token 与云端 baseUrl。
  */
 export async function postLocalUsageSync(options: {
   deviceToken: string;
@@ -110,7 +110,7 @@ export async function postLocalUsageSync(options: {
   if (isRemoteHttpBase(bu)) body.insforgeBaseUrl = bu.trim();
   const authHeaders = await getLocalApiAuthHeaders();
 
-  const res = await fetch("/functions/tokentracker-local-sync", {
+  const res = await fetch("/functions/tokenusage-local-sync", {
     method: "POST",
     headers: { "Content-Type": "application/json", Accept: "application/json", ...authHeaders },
     body: JSON.stringify(body),

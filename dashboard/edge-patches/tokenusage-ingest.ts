@@ -1,5 +1,5 @@
 /**
- * InsForge Edge：接收本地 CLI 上传的用量数据，写入 tokentracker_hourly。
+ * InsForge Edge：接收本地 CLI 上传的用量数据，写入 tokenusage_hourly。
  * 用 device token（SHA-256 hash）验证身份，用 service role key 写 DB。
  */
 import { createClient } from "npm:@insforge/sdk";
@@ -8,7 +8,7 @@ const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
   "Access-Control-Allow-Headers":
-    "Content-Type, Authorization, apikey, x-tokentracker-device-token-hash",
+    "Content-Type, Authorization, apikey, x-tokenusage-device-token-hash",
 };
 
 function json(data: unknown, status = 200) {
@@ -58,7 +58,7 @@ export default async function (req: Request): Promise<Response> {
   const tokenHash = await sha256Hex(deviceToken);
 
   const { data: tokenRow, error: tokenErr } = await client.database
-    .from("tokentracker_device_tokens")
+    .from("tokenusage_device_tokens")
     .select("user_id, device_id")
     .eq("token_hash", tokenHash)
     .is("revoked_at", null)
@@ -117,7 +117,7 @@ export default async function (req: Request): Promise<Response> {
   const rows = Array.from(dedupedMap.values());
 
   const { error: upsertErr } = await client.database
-    .from("tokentracker_hourly")
+    .from("tokenusage_hourly")
     .upsert(rows, {
       onConflict: "user_id,device_id,hour_start,source,model",
     });

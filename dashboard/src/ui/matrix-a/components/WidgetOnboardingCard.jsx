@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from "motion/react";
 import { copy } from "../../../lib/copy.ts";
 
 const DISMISS_KEY = "widgetOnboardingDismissed";
-const NATIVE_APP_KEY = "tokentracker_native_app";
+const NATIVE_APP_KEY = "tokenusage_native_app";
 
 /** True when loaded inside the native macOS app (WKWebView with ?app=1). */
 const isNativeApp = (() => {
@@ -19,7 +19,7 @@ const isNativeApp = (() => {
 })();
 
 /**
- * Promotes the macOS desktop widgets bundled with TokenTrackerBar 0.5.38+.
+ * Promotes the macOS desktop widgets bundled with TokenUsageBar 0.5.38+.
  * Only renders inside the native app — widgets are macOS-only.
  * Dismissible; remembers the choice via localStorage.
  */

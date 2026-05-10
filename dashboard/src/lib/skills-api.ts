@@ -2,7 +2,7 @@ import { getLocalApiAuthHeaders } from "./local-api-auth";
 
 type AnyRecord = Record<string, any>;
 
-const SLUG = "tokentracker-skills";
+const SLUG = "tokenusage-skills";
 
 async function fetchSkillsJson(params?: AnyRecord) {
   const url = new URL(`/functions/${SLUG}`, window.location.origin);

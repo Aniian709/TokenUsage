@@ -4450,7 +4450,7 @@ async function parseCodebuddyIncremental({
 
 function resolveOmpHome(env = process.env) {
   const home = env.HOME || require("node:os").homedir();
-  // Honor TokenTracker override first, then oh-my-pi upstream env vars.
+  // Honor TokenUsage override first, then oh-my-pi upstream env vars.
   if (env.OMP_HOME) return env.OMP_HOME;
   if (env.PI_CONFIG_DIR) return path.join(home, env.PI_CONFIG_DIR);
   return path.join(home, ".omp");
@@ -4704,7 +4704,7 @@ async function parseOmpIncremental({
 // config.json to enumerate every rootPath rather than just globbing the
 // default directory.
 //
-// Token semantics map directly onto TokenTracker conventions — `inputTokens`
+// Token semantics map directly onto TokenUsage conventions — `inputTokens`
 // is already pure non-cached input (no Codex-style trap, see
 // feedback_rollout_input_semantics.md). Re-parses are idempotent: the header
 // is rewritten as the session grows, and we dedup by sessionId combined with

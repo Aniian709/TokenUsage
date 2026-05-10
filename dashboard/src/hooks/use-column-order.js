@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 
-const STORAGE_KEY = "tokentracker.leaderboard.columnOrder.v1";
+const STORAGE_KEY = "tokenusage.leaderboard.columnOrder.v1";
 
 function readStored() {
   if (typeof window === "undefined") return null;

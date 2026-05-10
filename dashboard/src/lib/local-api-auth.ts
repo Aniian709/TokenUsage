@@ -26,5 +26,5 @@ export async function getLocalApiAuthToken(fetchImpl: typeof fetch = fetch): Pro
 
 export async function getLocalApiAuthHeaders(fetchImpl: typeof fetch = fetch): Promise<Record<string, string>> {
   const token = await getLocalApiAuthToken(fetchImpl);
-  return { "x-tokentracker-local-auth": token };
+  return { "x-tokenusage-local-auth": token };
 }

@@ -1,6 +1,6 @@
 import { safeGetItem, safeSetItem } from "./safe-browser";
 
-export const LOCALE_STORAGE_KEY = "tokentracker-locale";
+export const LOCALE_STORAGE_KEY = "tokenusage-locale";
 export const SYSTEM_LOCALE = "system";
 export const EN_LOCALE = "en";
 export const ZH_CN_LOCALE = "zh-CN";

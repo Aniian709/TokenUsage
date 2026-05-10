@@ -17,16 +17,16 @@ import { getLocalApiAuthHeaders } from "./local-api-auth";
 type AnyRecord = Record<string, any>;
 
 const PATHS = {
-  usageSummary: "tokentracker-usage-summary",
-  usageDaily: "tokentracker-usage-daily",
-  usageHourly: "tokentracker-usage-hourly",
-  usageMonthly: "tokentracker-usage-monthly",
-  usageHeatmap: "tokentracker-usage-heatmap",
-  usageModelBreakdown: "tokentracker-usage-model-breakdown",
-  projectUsageSummary: "tokentracker-project-usage-summary",
-  userStatus: "tokentracker-user-status",
-  localSync: "tokentracker-local-sync",
-  usageLimits: "tokentracker-usage-limits",
+  usageSummary: "tokenusage-usage-summary",
+  usageDaily: "tokenusage-usage-daily",
+  usageHourly: "tokenusage-usage-hourly",
+  usageMonthly: "tokenusage-usage-monthly",
+  usageHeatmap: "tokenusage-usage-heatmap",
+  usageModelBreakdown: "tokenusage-usage-model-breakdown",
+  projectUsageSummary: "tokenusage-project-usage-summary",
+  userStatus: "tokenusage-user-status",
+  localSync: "tokenusage-local-sync",
+  usageLimits: "tokenusage-usage-limits",
 };
 
 async function fetchLocalJson(slug: string, params?: AnyRecord, options?: AnyRecord) {
@@ -173,13 +173,13 @@ export async function getLeaderboard({
   // (bad signature, expired, rotated secret). Passing user_id as a query
   // param lets the server compute `is_me` without ever touching the
   // Authorization header.
-  return fetchInsforgeFunction("tokentracker-leaderboard", {
+  return fetchInsforgeFunction("tokenusage-leaderboard", {
     params: { period, limit, offset, user_id: userId },
   });
 }
 
 export async function getPublicVisibility({ accessToken }: AnyRecord = {}) {
-  return fetchInsforgeFunction("tokentracker-public-visibility", {
+  return fetchInsforgeFunction("tokenusage-public-visibility", {
     accessToken,
     method: "GET",
   });
@@ -200,7 +200,7 @@ export async function setPublicVisibility({
   // null is a valid value (clears the URL), so check for presence via `in`-style
   if (github_url !== undefined) body.github_url = github_url === null ? null : String(github_url);
   if (show_github_url !== undefined) body.show_github_url = Boolean(show_github_url);
-  return fetchInsforgeFunction("tokentracker-public-visibility", {
+  return fetchInsforgeFunction("tokenusage-public-visibility", {
     accessToken,
     method: "POST",
     body,
@@ -211,7 +211,7 @@ export async function refreshLeaderboard({ accessToken, period, source }: AnyRec
   const body: AnyRecord = {};
   if (period) body.period = period;
   if (typeof source === "string" && source.trim()) body.source = source.trim();
-  return fetchInsforgeFunction("tokentracker-leaderboard-refresh", {
+  return fetchInsforgeFunction("tokenusage-leaderboard-refresh", {
     accessToken,
     method: "POST",
     body,
@@ -235,7 +235,7 @@ export async function getLeaderboardProfile({
       entry: match,
     };
   }
-  return fetchInsforgeFunction("tokentracker-leaderboard-profile", {
+  return fetchInsforgeFunction("tokenusage-leaderboard-profile", {
     accessToken,
     params: { user_id: userId, period },
   });

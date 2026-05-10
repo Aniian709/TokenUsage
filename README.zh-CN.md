@@ -12,7 +12,7 @@
 
 `TokenUsage` 是一个以 Windows 本地使用为主的 `Codex` / `Claude Code` Token 用量监测面板。
 
-它保留了原始 TokenTracker 的整体视觉风格，但仓库当前面向的是本地使用场景：
+它保留了原始 TokenUsage 的整体视觉风格，但仓库当前面向的是本地使用场景：
 - 无登录流程
 - 无排行榜
 - 本地历史持久化
@@ -148,7 +148,7 @@ http://127.0.0.1:7680
 常见来源包括：
 - `~/.codex/...`
 - `~/.claude/...`
-- `~/.tokentracker/...`
+- `~/.tokenusage/...`
 
 ## 重建前端
 

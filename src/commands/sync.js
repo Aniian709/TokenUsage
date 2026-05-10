@@ -890,7 +890,7 @@ async function scheduleAutoRetry({
   spawnAutoRetryProcess({
     retryPath,
     trackerBinPath: path.join(trackerDir, "app", "bin", "tracker.js"),
-    fallbackPkg: "tokentracker-cli",
+    fallbackPkg: "tokenusage-cli",
     delayMs,
   });
   return { scheduled: true, retryAtMs: retryMs };
@@ -961,7 +961,7 @@ const AUTO_RETRY_MAX_DELAY_MS = 2 * 60 * 60 * 1000;
 
 const readline = require("node:readline");
 
-const INGEST_SLUG = "tokentracker-ingest";
+const INGEST_SLUG = "tokenusage-ingest";
 const MAX_INGEST_BUCKETS = 500;
 
 async function drainQueueToCloud({ baseUrl, deviceToken, queuePath, queueStatePath, maxBatches = 5, batchSize = 200 }) {

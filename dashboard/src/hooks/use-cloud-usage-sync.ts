@@ -38,7 +38,7 @@ export function useCloudUsageSync(): void {
         try {
           await runCloudUsageSyncIfDue(() => insforge.getAccessToken());
         } catch (e) {
-          console.warn("[tokentracker] cloud usage sync:", e);
+          console.warn("[tokenusage] cloud usage sync:", e);
         } finally {
           runRef.current = false;
         }

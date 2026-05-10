@@ -194,7 +194,7 @@ export function LoginPage() {
   useEffect(() => {
     if (isNativeLogin && typeof window !== "undefined") {
       try {
-        window.sessionStorage.setItem("tokentracker_native_login", "1");
+        window.sessionStorage.setItem("tokenusage_native_login", "1");
       } catch {
         // Ignore storage failures; OAuth can still proceed without the marker.
       }

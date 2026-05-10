@@ -19,8 +19,8 @@ const COPY_PENDING = new Map<string, (result: CopyImageResult) => void>();
 
 function ensureListener(): void {
   if (typeof window === "undefined") return;
-  if ((window as any).__tokentrackerNativeSaveListener) return;
-  (window as any).__tokentrackerNativeSaveListener = true;
+  if ((window as any).__tokenusageNativeSaveListener) return;
+  (window as any).__tokenusageNativeSaveListener = true;
   window.addEventListener("native:saveImageResult", (event: any) => {
     const detail = event?.detail || {};
     const requestId = typeof detail.requestId === "string" ? detail.requestId : null;

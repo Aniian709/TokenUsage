@@ -12,7 +12,7 @@ import { copy } from "../../lib/copy";
 import { normalizeGithubProfileUrl, pickDisplayName, pickEmail } from "./AccountSectionUtils.js";
 
 function warnSettingsAction(label, error) {
-  console.warn(`[tokentracker] settings ${label}:`, error);
+  console.warn(`[tokenusage] settings ${label}:`, error);
 }
 
 function useCloudSyncControl(getAccessToken, enabled, signedIn) {

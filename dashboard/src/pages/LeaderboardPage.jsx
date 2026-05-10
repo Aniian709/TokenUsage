@@ -52,7 +52,7 @@ import {
 
 const PAGE_SIZE_OPTIONS = [10, 20, 50, 100];
 const DEFAULT_PAGE_SIZE = 20;
-const PAGE_SIZE_STORAGE_KEY = "tokentracker:leaderboard:pageSize";
+const PAGE_SIZE_STORAGE_KEY = "tokenusage:leaderboard:pageSize";
 
 function readStoredPageSize() {
   if (typeof window === "undefined") return DEFAULT_PAGE_SIZE;
@@ -394,7 +394,7 @@ export function LeaderboardPage({
       if (token) await refreshLeaderboard({ accessToken: token, period, source: "leaderboard-enable-sync" });
       setListReloadToken((v) => v + 1);
     } catch (e) {
-      console.warn("[tokentracker] sync:", e);
+      console.warn("[tokenusage] sync:", e);
     } finally {
       setSyncing(false);
     }

@@ -7,10 +7,7 @@
     "tokenusage": "bin/tracker.js",
     "tokenusage-cli": "bin/tracker.js",
     "tokenusage-tracker": "bin/tracker.js",
-    "tokentracker-cli": "bin/tracker.js",
-    "tracker": "bin/tracker.js",
-    "tokentracker": "bin/tracker.js",
-    "tokentracker-tracker": "bin/tracker.js"
+    "tracker": "bin/tracker.js"
   },
   "files": [
     "bin/",

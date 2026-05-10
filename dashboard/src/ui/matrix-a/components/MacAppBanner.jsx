@@ -10,7 +10,7 @@ const LOGIN_DISMISS_KEY = "leaderboardBannerDismissed";
 const RELEASE_URL = "https://github.com/Aniian709/TokenUsage/releases/latest";
 
 /** True when loaded inside the native macOS app (WKWebView with ?app=1) */
-const NATIVE_APP_KEY = "tokentracker_native_app";
+const NATIVE_APP_KEY = "tokenusage_native_app";
 const isNativeApp = (() => {
   try {
     if (new URLSearchParams(window.location.search).get("app") === "1") {

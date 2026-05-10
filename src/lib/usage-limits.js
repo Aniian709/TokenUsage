@@ -1229,7 +1229,7 @@ function antigravityUnleashBody() {
         hasAnthropicModelAccess: "true",
         ide: "antigravity",
         ideVersion: "unknown",
-        installationId: "tokentracker",
+        installationId: "tokenusage",
         language: "UNSPECIFIED",
         os: "macos",
         requestedModelId: "MODEL_UNSPECIFIED",

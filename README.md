@@ -12,7 +12,7 @@
 
 `TokenUsage` is a Windows-first local dashboard for tracking token usage from `Codex` and `Claude Code`.
 
-It keeps the visual style of the original TokenTracker dashboard, but this repository is focused on local use:
+It keeps the visual style of the original TokenUsage dashboard, but this repository is focused on local use:
 - no login flow
 - no leaderboard
 - persisted local history
@@ -150,7 +150,7 @@ This project reads local history from your machine and keeps local snapshots to 
 Examples of local sources include:
 - `~/.codex/...`
 - `~/.claude/...`
-- local tracker cache under `~/.tokentracker/...`
+- local tracker cache under `~/.tokenusage/...`
 
 ## Rebuild the Frontend
 

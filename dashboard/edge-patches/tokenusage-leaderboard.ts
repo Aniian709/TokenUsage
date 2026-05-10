@@ -15,7 +15,7 @@
  * so no JWT validation path can ever fire for Leaderboard reads.
  *
  * Security note: `user_id` from the query is only used for row-highlight. All
- * leaderboard entries are public data in `tokentracker_leaderboard_snapshots`,
+ * leaderboard entries are public data in `tokenusage_leaderboard_snapshots`,
  * so spoofing `user_id` at worst re-highlights a different row — no PII or
  * private data is exposed.
  */
@@ -112,7 +112,7 @@ export default async function (req: Request): Promise<Response> {
     // by the refresh job. Hardcoding (2024-01-01, today) used to 404 whenever
     // today's snapshot hadn't been generated yet, so the UI saw "no data".
     const { data: latest } = await client.database
-      .from("tokentracker_leaderboard_snapshots")
+      .from("tokenusage_leaderboard_snapshots")
       .select("from_day, to_day")
       .eq("period", "total")
       .order("to_day", { ascending: false })
@@ -128,7 +128,7 @@ export default async function (req: Request): Promise<Response> {
     error,
     count,
   } = await client.database
-    .from("tokentracker_leaderboard_snapshots")
+    .from("tokenusage_leaderboard_snapshots")
     .select("*", { count: "exact" })
     .eq("period", period)
     .eq("from_day", from_day)
@@ -141,7 +141,7 @@ export default async function (req: Request): Promise<Response> {
   if (requestedUserId) {
     try {
       const { data: mr } = await client.database
-        .from("tokentracker_leaderboard_snapshots")
+        .from("tokenusage_leaderboard_snapshots")
         .select("*")
         .eq("period", period)
         .eq("from_day", from_day)

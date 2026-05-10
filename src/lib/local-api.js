@@ -677,8 +677,8 @@ function createLocalApiHandler({ queuePath }) {
   let _nativeAuthExpiry = 0;
 
   function isAuthorizedLocalMutation(req) {
-    const headerToken = req?.headers?.["x-tokentracker-local-auth"];
-    const cookieToken = parseCookieHeader(req?.headers?.cookie).get("tokentracker_local_auth");
+    const headerToken = req?.headers?.["x-tokenusage-local-auth"];
+    const cookieToken = parseCookieHeader(req?.headers?.cookie).get("tokenusage_local_auth");
     const token = typeof headerToken === "string" && headerToken.trim()
       ? headerToken.trim()
       : cookieToken || "";
@@ -791,7 +791,7 @@ function createLocalApiHandler({ queuePath }) {
     }
 
     // --- local-sync (POST) ---
-    if (p === "/functions/tokentracker-local-sync") {
+    if (p === "/functions/tokenusage-local-sync") {
       if (String(req.method || "GET").toUpperCase() !== "POST") {
         json(res, { ok: false, error: "Method Not Allowed" }, 405);
         return true;
@@ -834,7 +834,7 @@ function createLocalApiHandler({ queuePath }) {
     }
 
     // --- usage-summary ---
-    if (p === "/functions/tokentracker-usage-summary") {
+    if (p === "/functions/tokenusage-usage-summary") {
       const from = url.searchParams.get("from") || "";
       const to = url.searchParams.get("to") || "";
       const timeZoneContext = getTimeZoneContext(url);
@@ -901,7 +901,7 @@ function createLocalApiHandler({ queuePath }) {
     }
 
     // --- usage-daily ---
-    if (p === "/functions/tokentracker-usage-daily") {
+    if (p === "/functions/tokenusage-usage-daily") {
       const from = url.searchParams.get("from") || "";
       const to = url.searchParams.get("to") || "";
       const timeZoneContext = getTimeZoneContext(url);
@@ -912,7 +912,7 @@ function createLocalApiHandler({ queuePath }) {
     }
 
     // --- usage-heatmap ---
-    if (p === "/functions/tokentracker-usage-heatmap") {
+    if (p === "/functions/tokenusage-usage-heatmap") {
       const weeks = parseInt(url.searchParams.get("weeks") || "52", 10);
       const timeZoneContext = getTimeZoneContext(url);
       const { rows, scope, excludedSources } = await scopedUsageRows(qp, url);
@@ -957,7 +957,7 @@ function createLocalApiHandler({ queuePath }) {
     }
 
     // --- usage-model-breakdown ---
-    if (p === "/functions/tokentracker-usage-model-breakdown") {
+    if (p === "/functions/tokenusage-usage-model-breakdown") {
       const from = url.searchParams.get("from") || "";
       const to = url.searchParams.get("to") || "";
       const timeZoneContext = getTimeZoneContext(url);
@@ -1018,7 +1018,7 @@ function createLocalApiHandler({ queuePath }) {
     }
 
     // --- project-usage-summary ---
-    if (p === "/functions/tokentracker-project-usage-summary") {
+    if (p === "/functions/tokenusage-project-usage-summary") {
       // Use the per-project bucket log that rollout.js emits — it already
       // carries the actual tokens attributed to each (project_key, source,
       // hour_start). Falling back to "session-file count × total tokens"
@@ -1091,7 +1091,7 @@ function createLocalApiHandler({ queuePath }) {
     }
 
     // --- user-status (stub) ---
-    if (p === "/functions/tokentracker-user-status") {
+    if (p === "/functions/tokenusage-user-status") {
       json(res, {
         user_id: "local-user", email: "local@localhost", name: "Local User", is_public: false,
         created_at: new Date().toISOString(),
@@ -1101,7 +1101,7 @@ function createLocalApiHandler({ queuePath }) {
     }
 
     // --- usage-hourly (stub for day-view) ---
-    if (p === "/functions/tokentracker-usage-hourly") {
+    if (p === "/functions/tokenusage-usage-hourly") {
       const day = url.searchParams.get("day") || new Date().toISOString().slice(0, 10);
       const timeZoneContext = getTimeZoneContext(url);
       const { rows, scope, excludedSources } = await scopedUsageRows(qp, url);
@@ -1111,7 +1111,7 @@ function createLocalApiHandler({ queuePath }) {
     }
 
     // --- usage-monthly (stub for trend view) ---
-    if (p === "/functions/tokentracker-usage-monthly") {
+    if (p === "/functions/tokenusage-usage-monthly") {
       const from = url.searchParams.get("from") || "";
       const to = url.searchParams.get("to") || "";
       const timeZoneContext = getTimeZoneContext(url);
@@ -1139,7 +1139,7 @@ function createLocalApiHandler({ queuePath }) {
     }
 
     // --- skills manager ---
-    if (p === "/functions/tokentracker-skills") {
+    if (p === "/functions/tokenusage-skills") {
       const method = String(req.method || "GET").toUpperCase();
       const skills = require("./skills-manager");
       try {
@@ -1222,7 +1222,7 @@ function createLocalApiHandler({ queuePath }) {
     }
 
     // --- usage-limits ---
-    if (p === "/functions/tokentracker-usage-limits") {
+    if (p === "/functions/tokenusage-usage-limits") {
       const { getUsageLimits, resetUsageLimitsCache } = require("./usage-limits");
       try {
         const forceRefresh = url.searchParams.get("refresh");

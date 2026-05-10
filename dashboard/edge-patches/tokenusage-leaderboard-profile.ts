@@ -4,7 +4,7 @@ const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
   "Access-Control-Allow-Headers":
-    "Content-Type, Authorization, apikey, x-tokentracker-device-token-hash",
+    "Content-Type, Authorization, apikey, x-tokenusage-device-token-hash",
 };
 
 function json(data: unknown, status = 200) {
@@ -97,7 +97,7 @@ async function windowBounds(client: any, period: string) {
       .slice(0, 10);
   } else {
     const { data: latest } = await client.database
-      .from("tokentracker_leaderboard_snapshots")
+      .from("tokenusage_leaderboard_snapshots")
       .select("from_day, to_day")
       .eq("period", "total")
       .order("to_day", { ascending: false })
@@ -136,7 +136,7 @@ export default async function (req: Request): Promise<Response> {
   const isSelf = Boolean(callerUserId && callerUserId === userId);
   if (!isSelf) {
     const { data: settings } = await client.database
-      .from("tokentracker_user_settings")
+      .from("tokenusage_user_settings")
       .select("leaderboard_public")
       .eq("user_id", userId)
       .maybeSingle();
@@ -149,7 +149,7 @@ export default async function (req: Request): Promise<Response> {
   const { from_day, to_day } = await windowBounds(client, period);
 
   const { data, error } = await client.database
-    .from("tokentracker_leaderboard_snapshots")
+    .from("tokenusage_leaderboard_snapshots")
     .select("*")
     .eq("user_id", userId)
     .eq("period", period)

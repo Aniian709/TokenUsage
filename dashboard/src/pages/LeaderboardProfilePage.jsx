@@ -210,7 +210,7 @@ export function LeaderboardProfilePage({
             >
               <img src="/app-icon.png" alt="" width={24} height={24} className="rounded-md" />
               <span className="text-sm font-semibold tracking-wide text-oai-black dark:text-white uppercase">
-                Token Tracker
+                TokenUsage
               </span>
             </Link>
             <div className="hidden sm:block">

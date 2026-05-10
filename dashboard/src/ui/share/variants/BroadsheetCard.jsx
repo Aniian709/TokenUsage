@@ -92,7 +92,7 @@ export function BroadsheetCard({ data }) {
               background: VERMILLION,
             }}
           />
-          The Token Tracker
+          The TokenUsage
         </div>
         <div
           style={{

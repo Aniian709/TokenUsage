@@ -26,7 +26,7 @@ import {
  *
  * Hardcoded strings ("TODAY", "203.2M", "claude-opus-4-6", etc.)
  * intentionally bypass copy.csv — they mirror the literal Swift string
- * constants in TokenTrackerWidget/Widgets/*.swift which ship English-only
+ * constants in TokenUsageWidget/Widgets/*.swift which ship English-only
  * in the native app. Keeping them inline makes the preview read as a
  * faithful screenshot.
  */
@@ -36,7 +36,7 @@ const WIDGET_H = 124;
 const ROUNDED_FONT = "ui-rounded, -apple-system, system-ui";
 
 // Model accent palette — mirrors WidgetTheme.modelDot in
-// TokenTrackerBar/TokenTrackerWidget/Views/WidgetTheme.swift
+// TokenUsageBar/TokenUsageWidget/Views/WidgetTheme.swift
 const MODEL_COLORS = ["#5A8CF2", "#9973E6", "#4DB8A6", "#E68C59"];
 
 // Source accent palette — mirrors WidgetTheme.sourceColor (SwiftUI system
@@ -905,7 +905,7 @@ function MenuBarDisplayCard({ overlayConfig, overlaySaving, onSaveOverlayConfig 
       <div className="mt-5 divide-y divide-oai-gray-100 border-t border-oai-gray-100 dark:divide-oai-gray-800 dark:border-oai-gray-800">
         <MenuBarToggleRow
           label="显示悬浮菜单栏"
-          hint="在 Windows 桌面顶部显示与 TokenTrackerBar 同风格的悬浮菜单栏。"
+          hint="在 Windows 桌面顶部显示与 TokenUsageBar 同风格的悬浮菜单栏。"
           checked={menuBarEnabled}
           disabled={!overlayConfig || overlaySaving}
           onChange={() => {

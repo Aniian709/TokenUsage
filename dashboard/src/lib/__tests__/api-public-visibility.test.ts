@@ -47,7 +47,7 @@ describe("public visibility API", () => {
     await expect(getPublicVisibility({ accessToken })).resolves.toEqual(payload);
 
     expect(fetchMock).toHaveBeenCalledWith(
-      "https://example.insforge.app/functions/tokentracker-public-visibility",
+      "https://example.insforge.app/functions/tokenusage-public-visibility",
       expect.objectContaining({
         method: "GET",
         headers: expect.objectContaining({
@@ -88,7 +88,7 @@ describe("public visibility API", () => {
     ).resolves.toEqual(payload);
 
     expect(fetchMock).toHaveBeenCalledWith(
-      "https://example.insforge.app/functions/tokentracker-public-visibility",
+      "https://example.insforge.app/functions/tokenusage-public-visibility",
       expect.objectContaining({
         method: "POST",
         body: JSON.stringify({ enabled: true, anonymous: false }),

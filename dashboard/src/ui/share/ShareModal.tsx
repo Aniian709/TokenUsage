@@ -145,7 +145,7 @@ export function ShareModal({ open, onClose, data, twitterText }: any) {
   }, [busy, ensureCardBlob, push]);
 
   const buildFilename = useCallback(
-    () => `tokentracker-share-${Date.now()}.png`,
+    () => `tokenusage-share-${Date.now()}.png`,
     [],
   );
 

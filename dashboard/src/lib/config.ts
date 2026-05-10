@@ -18,7 +18,7 @@ export function getBackendBaseUrl() {
 }
 
 /**
- * 排行榜专用：`tokentracker-leaderboard`、公开可见性等 InsForge Edge Functions。
+ * 排行榜专用：`tokenusage-leaderboard`、公开可见性等 InsForge Edge Functions。
  * 与 `getInsforgeBaseUrl()` 相同；在 localhost 只要配置了 `VITE_INSFORGE_BASE_URL` 仍会请求云端。
  */
 export function getLeaderboardBaseUrl() {

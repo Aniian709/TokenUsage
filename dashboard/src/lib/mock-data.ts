@@ -17,9 +17,9 @@ type HourRow = {
   missing?: boolean;
 };
 
-const DEFAULT_MOCK_SEED = "tokentracker";
+const DEFAULT_MOCK_SEED = "tokenusage";
 const MOCK_PROJECT_REPOS = [
-  "victorgpt/tokentracker",
+  "victorgpt/tokenusage",
   "spacedriveapp/spacedrive",
   "acme/alpha",
   "acme/beta",

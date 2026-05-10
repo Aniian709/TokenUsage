@@ -1,12 +1,12 @@
 /**
- * Bridge helpers for talking to the macOS TokenTrackerBar host via WKWebView's
+ * Bridge helpers for talking to the macOS TokenUsageBar host via WKWebView's
  * `window.webkit.messageHandlers.nativeBridge`. The native side dispatches a
  * `native:settings` CustomEvent on `window` whenever state changes.
  *
  * Safe no-ops in browser/cloud mode.
  */
 
-const NATIVE_APP_KEY = "tokentracker_native_app";
+const NATIVE_APP_KEY = "tokenusage_native_app";
 
 // Module-level cache for native system appearance.
 // An always-on listener (installed at module load) keeps this fresh,
@@ -59,7 +59,7 @@ export function isNativeApp() {
   }
 }
 
-/** True when running inside TokenTrackerBar WKWebView (bridge is always present). */
+/** True when running inside TokenUsageBar WKWebView (bridge is always present). */
 export function isNativeEmbed() {
   if (typeof window === "undefined") return false;
   return Boolean(window.webkit?.messageHandlers?.nativeBridge);
@@ -81,7 +81,7 @@ function post(message) {
     handler.postMessage(message);
     return true;
   } catch (err) {
-    console.warn("[tokentracker] nativeBridge post failed:", err);
+    console.warn("[tokenusage] nativeBridge post failed:", err);
     return false;
   }
 }

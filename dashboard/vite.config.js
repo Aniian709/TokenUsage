@@ -37,7 +37,7 @@ function loadAppVersion() {
     const parsed = JSON.parse(raw);
     return String(parsed?.version || "").trim() || null;
   } catch (error) {
-    console.warn("[tokentracker] Failed to read package.json version:", error.message);
+    console.warn("[tokenusage] Failed to read package.json version:", error.message);
     return null;
   }
 }
@@ -107,7 +107,7 @@ function loadCopyRegistry() {
   try {
     raw = fs.readFileSync(COPY_PATH, "utf8");
   } catch (error) {
-    console.warn("[tokentracker] Failed to read copy registry:", error.message);
+    console.warn("[tokenusage] Failed to read copy registry:", error.message);
     return new Map();
   }
 
@@ -118,7 +118,7 @@ function loadCopyRegistry() {
   const keyIndex = header.indexOf("key");
   const textIndex = header.indexOf("text");
   if (keyIndex === -1 || textIndex === -1) {
-    console.warn("[tokentracker] Copy registry missing key/text columns.");
+    console.warn("[tokenusage] Copy registry missing key/text columns.");
     return new Map();
   }
 
@@ -147,7 +147,7 @@ function buildMeta(prefix = "landing") {
 
   const missing = COPY_REQUIRED_KEYS.filter((key) => !map.has(key));
   if (missing.length) {
-    console.warn("[tokentracker] Copy registry missing keys:", missing.join(", "));
+    console.warn("[tokenusage] Copy registry missing keys:", missing.join(", "));
   }
 
   return {
@@ -194,14 +194,14 @@ function injectRichMeta(html, prefix) {
 
 function richLinkMetaPlugin() {
   return {
-    name: "tokentracker-rich-link-meta",
+    name: "tokenusage-rich-link-meta",
     transformIndexHtml(html, ctx) {
       return injectRichMeta(html, resolveMetaPrefix(ctx));
     },
   };
 }
 
-// 本地数据 API 插件 - 直接读取 ~/.tokentracker/tracker/queue.jsonl
+// 本地数据 API 插件 - 直接读取 ~/.tokenusage/tracker/queue.jsonl
 // 本地 API 处理函数
 function trimCommandOutput(value, maxLength = 4000) {
   const text = String(value || "");
@@ -228,7 +228,7 @@ function readJsonBodyVite(req) {
 
 async function runLocalSyncCommand(extraEnv = {}) {
   return await new Promise((resolve, reject) => {
-    const child = spawn(process.platform === "win32" ? "npx.cmd" : "npx", ["tokentracker-cli", "sync"], {
+    const child = spawn(process.platform === "win32" ? "npx.cmd" : "npx", ["tokenusage-cli", "sync"], {
       cwd: REPO_ROOT,
       env: { ...process.env, ...extraEnv },
       stdio: ["ignore", "pipe", "pipe"],
@@ -295,7 +295,7 @@ const __pricing = __viteRequire(path.resolve(REPO_ROOT, "src/lib/pricing"));
 const { getModelPricing, computeRowCost } = __pricing;
 
 async function handleLocalApi(req, res, url) {
-  const QUEUE_PATH = path.join(os.homedir(), ".tokentracker", "tracker", "queue.jsonl");
+  const QUEUE_PATH = path.join(os.homedir(), ".tokenusage", "tracker", "queue.jsonl");
 
   function isLegacyInclusiveCodexRow(row) {
     if (!row || (row.source !== "codex" && row.source !== "every-code")) return false;
@@ -371,7 +371,7 @@ async function handleLocalApi(req, res, url) {
 
   const pathname = url.pathname;
 
-  if (pathname === "/functions/tokentracker-local-sync") {
+  if (pathname === "/functions/tokenusage-local-sync") {
     if (String(req.method || "GET").toUpperCase() !== "POST") {
       res.statusCode = 405;
       res.setHeader("Allow", "POST");
@@ -419,7 +419,7 @@ async function handleLocalApi(req, res, url) {
   }
 
   // 处理 usage-summary
-  if (pathname === "/functions/tokentracker-usage-summary") {
+  if (pathname === "/functions/tokenusage-usage-summary") {
     const from = url.searchParams.get("from") || "";
     const to = url.searchParams.get("to") || "";
     const rows = readQueueData();
@@ -507,7 +507,7 @@ async function handleLocalApi(req, res, url) {
   }
 
   // 处理 usage-daily
-  if (pathname === "/functions/tokentracker-usage-daily") {
+  if (pathname === "/functions/tokenusage-usage-daily") {
     const from = url.searchParams.get("from") || "";
     const to = url.searchParams.get("to") || "";
     const rows = readQueueData();
@@ -518,7 +518,7 @@ async function handleLocalApi(req, res, url) {
   }
 
   // 处理 usage-heatmap
-  if (pathname === "/functions/tokentracker-usage-heatmap") {
+  if (pathname === "/functions/tokenusage-usage-heatmap") {
     const weeks = parseInt(url.searchParams.get("weeks") || "52", 10);
     const rows = readQueueData();
     const daily = aggregateByDay(rows);
@@ -571,7 +571,7 @@ async function handleLocalApi(req, res, url) {
   }
 
   // 处理 usage-model-breakdown
-  if (pathname === "/functions/tokentracker-usage-model-breakdown") {
+  if (pathname === "/functions/tokenusage-usage-model-breakdown") {
     const from = url.searchParams.get("from") || "";
     const to = url.searchParams.get("to") || "";
     const rows = readQueueData();
@@ -650,7 +650,7 @@ async function handleLocalApi(req, res, url) {
   }
 
   // 处理 project-usage-summary
-  if (pathname === "/functions/tokentracker-project-usage-summary") {
+  if (pathname === "/functions/tokenusage-project-usage-summary") {
     // 从原始日志解析项目数据
     const projectMap = new Map();
 
@@ -824,7 +824,7 @@ async function handleLocalApi(req, res, url) {
   }
 
   // 处理 usage-limits
-  if (pathname === "/functions/tokentracker-usage-limits") {
+  if (pathname === "/functions/tokenusage-usage-limits") {
     try {
       const esmRequire = createRequire(import.meta.url);
       const { getUsageLimits, resetUsageLimitsCache } = esmRequire("../src/lib/usage-limits");
@@ -848,7 +848,7 @@ async function handleLocalApi(req, res, url) {
   }
 
   // 处理 user-status
-  if (pathname === "/functions/tokentracker-user-status") {
+  if (pathname === "/functions/tokenusage-user-status") {
     res.setHeader("Content-Type", "application/json");
     res.end(JSON.stringify({
       user_id: "local-user", email: "local@localhost", name: "Local User", is_public: false,
@@ -893,7 +893,7 @@ async function proxyToLocalCli(req, res) {
 
 function localDataApiPlugin() {
   return {
-    name: "tokentracker-local-data-api",
+    name: "tokenusage-local-data-api",
     configureServer(server) {
       // 添加中间件到最前面，拦截所有请求
       server.middlewares.use((req, res, next) => {

@@ -6,7 +6,7 @@ const { resolveTrackerRootDir } = require("./tracker-paths");
 
 /**
  * 跨 AI CLI 自动激活检测
- * 在 tokentracker 各种命令执行时顺带检测并完成配置
+ * 在 tokenusage 各种命令执行时顺带检测并完成配置
  */
 
 const AI_CLIS = [
@@ -116,7 +116,7 @@ async function checkCodexConfigured({ home }) {
   try {
     const content = await fs.readFile(configPath, "utf8");
     // 检查是否已配置 notify
-    return content.includes("tokentracker") || content.includes("notify");
+    return content.includes("tokenusage") || content.includes("notify");
   } catch {
     return false;
   }
@@ -158,10 +158,10 @@ async function checkClaudeCodeConfigured({ home }) {
   const settingsPath = path.join(home, ".claude", "settings.json");
   try {
     const settings = await readJson(settingsPath);
-    // 检查是否已有 tokentracker 相关的 hook
+    // 检查是否已有 tokenusage 相关的 hook
     const hooks = settings?.hooks?.SessionStart || [];
     return hooks.some(h =>
-      h.hooks?.some(hook => hook.command?.includes("tokentracker"))
+      h.hooks?.some(hook => hook.command?.includes("tokenusage"))
     );
   } catch {
     return false;
@@ -180,7 +180,7 @@ async function configureClaudeCode({ home, silent }) {
     // 检查是否已存在
     const exists = settings.hooks.SessionStart.some(h => 
       h.matcher === "startup" &&
-      h.hooks?.some(hook => hook.command?.includes("tokentracker activate-if-needed"))
+      h.hooks?.some(hook => hook.command?.includes("tokenusage activate-if-needed"))
     );
     
     if (!exists) {
@@ -188,7 +188,7 @@ async function configureClaudeCode({ home, silent }) {
         matcher: "startup",
         hooks: [{
           type: "command",
-          command: "tokentracker activate-if-needed --silent 2>/dev/null || true"
+          command: "tokenusage activate-if-needed --silent 2>/dev/null || true"
         }]
       });
       
@@ -217,7 +217,7 @@ async function checkOpencodeConfigured({ home }) {
   const pluginDir = path.join(home, ".config", "opencode", "plugins");
   try {
     const files = await fs.readdir(pluginDir);
-    return files.some(f => f.includes("tokentracker"));
+    return files.some(f => f.includes("tokenusage"));
   } catch {
     return false;
   }
@@ -228,7 +228,7 @@ async function configureOpencode({ home, silent }) {
     const pluginDir = path.join(home, ".config", "opencode", "plugins");
     await fs.mkdir(pluginDir, { recursive: true });
     
-    const pluginPath = path.join(pluginDir, "tokentracker-activation.js");
+    const pluginPath = path.join(pluginDir, "tokenusage-activation.js");
     const pluginCode = `export const TokentrackerActivation = async ({ $ }) => {
   return {
     "session.created": async () => {
@@ -261,7 +261,7 @@ async function checkEveryCodeConfigured({ home }) {
   const configPath = path.join(home, ".code", "config.toml");
   try {
     const content = await fs.readFile(configPath, "utf8");
-    return content.includes("tokentracker");
+    return content.includes("tokenusage");
   } catch {
     return false;
   }
@@ -281,8 +281,8 @@ async function configureEveryCode({ home, silent }) {
     const notifyCmd = path.join(resolveTrackerRootDir(home), "bin", "notify.cjs");
     const notifyLine = `notify = ["/usr/bin/env", "node", "${notifyCmd}"]`;
 
-    if (!content.includes("tokentracker")) {
-      content = content.trim() + "\n\n# tokentracker integration\n" + notifyLine + "\n";
+    if (!content.includes("tokenusage")) {
+      content = content.trim() + "\n\n# tokenusage integration\n" + notifyLine + "\n";
       await fs.writeFile(configPath, content, "utf8");
     }
     return true;

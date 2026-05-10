@@ -34,7 +34,7 @@
       })();
       (function(){
         var t;
-        try { t = localStorage.getItem("tokentracker-theme"); } catch(e) {}
+        try { t = localStorage.getItem("tokenusage-theme"); } catch(e) {}
         var dark = t === "dark" || (t !== "light" && matchMedia("(prefers-color-scheme:dark)").matches);
         if (dark) document.documentElement.classList.add("dark");
       })();

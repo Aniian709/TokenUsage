@@ -99,18 +99,18 @@ export default async function (req: Request): Promise<Response> {
 
   if (req.method === "GET") {
     const { data } = await client.database
-      .from("tokentracker_user_settings")
+      .from("tokenusage_user_settings")
       .select("leaderboard_public, leaderboard_anonymous, github_url, show_github_url, updated_at")
       .eq("user_id", userId)
       .maybeSingle();
     const { data: pv } = await client.database
-      .from("tokentracker_public_views")
+      .from("tokenusage_public_views")
       .select("token_hash, updated_at")
       .eq("user_id", userId)
       .is("revoked_at", null)
       .maybeSingle();
     const { data: profile } = await client.database
-      .from("tokentracker_user_profiles")
+      .from("tokenusage_user_profiles")
       .select("display_name")
       .eq("user_id", userId)
       .maybeSingle();
@@ -172,7 +172,7 @@ export default async function (req: Request): Promise<Response> {
       if (body.anonymous !== undefined) upsertRow.leaderboard_anonymous = Boolean(body.anonymous);
       if (normalizedGithubUrl !== undefined) upsertRow.github_url = normalizedGithubUrl;
       if (body.show_github_url !== undefined) upsertRow.show_github_url = Boolean(body.show_github_url);
-      await client.database.from("tokentracker_user_settings").upsert(
+      await client.database.from("tokenusage_user_settings").upsert(
         upsertRow,
         { onConflict: "user_id" },
       );
@@ -181,7 +181,7 @@ export default async function (req: Request): Promise<Response> {
     // Update display_name in user_profiles
     if (typeof body.display_name === "string") {
       const trimmed = body.display_name.trim().slice(0, 50);
-      await client.database.from("tokentracker_user_profiles").upsert(
+      await client.database.from("tokenusage_user_profiles").upsert(
         {
           user_id: userId,
           display_name: trimmed || null,

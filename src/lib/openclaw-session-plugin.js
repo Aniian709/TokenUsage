@@ -37,7 +37,7 @@ function resolveOpenclawSessionPluginPaths({
 async function installOpenclawSessionPlugin({
   home = os.homedir(),
   trackerDir,
-  packageName = "tokentracker-cli",
+  packageName = "tokenusage-cli",
   env = process.env,
 } = {}) {
   const paths = resolveOpenclawSessionPluginPaths({ home, trackerDir, env });
@@ -84,7 +84,7 @@ async function installOpenclawSessionPlugin({
 async function ensureOpenclawSessionPluginFiles({
   pluginDir,
   trackerDir,
-  packageName = "tokentracker-cli",
+  packageName = "tokenusage-cli",
   openclawHome,
 } = {}) {
   if (!pluginDir || !trackerDir) throw new Error("pluginDir and trackerDir are required");
@@ -307,7 +307,7 @@ function runOpenclawCli(args, env = process.env) {
 function buildSessionPluginPackageJson() {
   return `${JSON.stringify(
     {
-      name: "@tokentracker/openclaw-session-sync",
+      name: "@tokenusage/openclaw-session-sync",
       version: "0.0.0",
       private: true,
       type: "module",
@@ -324,8 +324,8 @@ function buildSessionPluginMeta() {
   return `${JSON.stringify(
     {
       id: OPENCLAW_SESSION_PLUGIN_ID,
-      name: "TokenTracker OpenClaw Session Sync",
-      description: "Trigger tokentracker sync on OpenClaw agent/session lifecycle events.",
+      name: "TokenUsage OpenClaw Session Sync",
+      description: "Trigger tokenusage sync on OpenClaw agent/session lifecycle events.",
       configSchema: {
         type: "object",
         additionalProperties: false,
@@ -337,9 +337,9 @@ function buildSessionPluginMeta() {
   )}\n`;
 }
 
-function buildSessionPluginIndex({ trackerDir, packageName = "tokentracker-cli", openclawHome }) {
+function buildSessionPluginIndex({ trackerDir, packageName = "tokenusage-cli", openclawHome }) {
   const trackerBinPath = path.join(trackerDir, "app", "bin", "tracker.js");
-  const fallbackPkg = packageName || "tokentracker-cli";
+  const fallbackPkg = packageName || "tokenusage-cli";
   const safeOpenclawHome = openclawHome || path.join(os.homedir(), ".openclaw");
 
   return (

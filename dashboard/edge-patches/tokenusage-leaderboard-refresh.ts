@@ -1,6 +1,6 @@
 /**
  * InsForge Edge：排行榜快照刷新。
- * 从 tokentracker_hourly 聚合数据，按 period 写入 tokentracker_leaderboard_snapshots。
+ * 从 tokenusage_hourly 聚合数据，按 period 写入 tokenusage_leaderboard_snapshots。
  * 接受 POST，可选 body: { period: "week"|"month"|"total" }，不传则刷新全部三个。
  */
 import { createClient } from "npm:@insforge/sdk";
@@ -286,7 +286,7 @@ export default async function (req: Request): Promise<Response> {
 
     // --- Rate limit: skip if generated_at within last 30s ---
     const { data: recentSnap } = await client.database
-      .from("tokentracker_leaderboard_snapshots")
+      .from("tokenusage_leaderboard_snapshots")
       .select("generated_at")
       .eq("period", period)
       .eq("from_day", from_day)
@@ -337,7 +337,7 @@ export default async function (req: Request): Promise<Response> {
 
     while (hasMore) {
       const { data: rows, error } = await client.database
-        .from("tokentracker_hourly")
+        .from("tokenusage_hourly")
         .select("user_id, source, model, hour_start, total_tokens, input_tokens, output_tokens, cached_input_tokens, cache_creation_input_tokens, reasoning_output_tokens")
         .gte("hour_start", rangeStart)
         .lt("hour_start", rangeEnd)
@@ -431,7 +431,7 @@ export default async function (req: Request): Promise<Response> {
     for (let i = 0; i < userIds.length; i += 25) {
       const batch = userIds.slice(i, i + 25);
       const { data: settings, error: settingsErr } = await client.database
-        .from("tokentracker_user_settings")
+        .from("tokenusage_user_settings")
         .select("user_id, leaderboard_public, leaderboard_anonymous, github_url, show_github_url")
         .in("user_id", batch);
 
@@ -455,7 +455,7 @@ export default async function (req: Request): Promise<Response> {
     for (let i = 0; i < userIds.length; i += 25) {
       const batch = userIds.slice(i, i + 25);
       const { data: users, error: profilesErr } = await client.database
-        .from("tokentracker_user_profiles")
+        .from("tokenusage_user_profiles")
         .select("user_id, display_name, avatar_url")
         .in("user_id", batch);
 
@@ -480,7 +480,7 @@ export default async function (req: Request): Promise<Response> {
       const missing = userIds.slice(i, i + 25).filter(id => !userProfiles.has(id));
       if (missing.length === 0) continue;
       const { data: existing, error: fallbackErr } = await client.database
-        .from("tokentracker_leaderboard_snapshots")
+        .from("tokenusage_leaderboard_snapshots")
         .select("user_id, display_name, avatar_url")
         .in("user_id", missing)
         .order("generated_at", { ascending: false });
@@ -550,7 +550,7 @@ export default async function (req: Request): Promise<Response> {
     for (let i = 0; i < upsertRows.length; i += 200) {
       const batch = upsertRows.slice(i, i + 200);
       const { error: upsertErr } = await client.database
-        .from("tokentracker_leaderboard_snapshots")
+        .from("tokenusage_leaderboard_snapshots")
         .upsert(batch, { onConflict: "user_id,period,from_day,to_day" });
 
       if (upsertErr) {

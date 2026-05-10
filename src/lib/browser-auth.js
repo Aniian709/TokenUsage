@@ -6,7 +6,7 @@ const { DEFAULT_BASE_URL } = require("./runtime-config");
 
 async function beginBrowserAuth({ baseUrl, dashboardUrl, timeoutMs, open }) {
   const nonce = crypto.randomBytes(16).toString("hex");
-  const callbackPath = `/tokentracker/callback/${nonce}`;
+  const callbackPath = `/tokenusage/callback/${nonce}`;
   const authUrl = dashboardUrl ? new URL("/", dashboardUrl) : new URL("/auth/sign-up", baseUrl);
   const postAuthRedirect = resolvePostAuthRedirect({ dashboardUrl, authUrl });
   const { callbackUrl, waitForCallback } = await startLocalCallbackServer({
@@ -71,7 +71,7 @@ async function startLocalCallbackServer({ callbackPath, timeoutMs, redirectUrl }
       res.end(
         [
           "<!doctype html>",
-          '<html><head><meta charset="utf-8"><title>TokenTracker</title></head>',
+          '<html><head><meta charset="utf-8"><title>TokenUsage</title></head>',
           "<body>",
           "<h2>Login succeeded</h2>",
           `<p>Redirecting to <a href="${redirectUrl}">dashboard</a>...</p>`,
@@ -83,7 +83,7 @@ async function startLocalCallbackServer({ callbackPath, timeoutMs, redirectUrl }
       res.end(
         [
           "<!doctype html>",
-          '<html><head><meta charset="utf-8"><title>TokenTracker</title></head>',
+          '<html><head><meta charset="utf-8"><title>TokenUsage</title></head>',
           "<body>",
           "<h2>Login succeeded</h2>",
           "<p>You can close this tab and return to the CLI.</p>",

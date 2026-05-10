@@ -2,7 +2,7 @@ key,module,page,component,slot,text,notes,status
 header.auth.sign_in_aria,shared,*,InsforgeUserHeaderControls,sign_in_aria,"Sign in",,active
 header.auth.user_fallback,shared,*,InsforgeUserHeaderControls,user_fallback,"User",,active
 header.cloud_sync.label,shared,*,InsforgeUserHeaderControls,cloud_sync_label,"Sync local usage to cloud",,active
-header.cloud_sync.hint,shared,*,InsforgeUserHeaderControls,cloud_sync_hint,"Runs local tokentracker sync so InsForge can ingest your queue. Turn off to keep usage offline only.",,active
+header.cloud_sync.hint,shared,*,InsforgeUserHeaderControls,cloud_sync_hint,"Runs local tokenusage sync so InsForge can ingest your queue. Turn off to keep usage offline only.",,active
 login.back_home,shared,LoginPage,LoginPage,back_home,"Back to home",,active
 login.cloud_only,shared,LoginPage,LoginPage,cloud_only,"Cloud sign-in is not configured. Use the local dashboard on localhost.",,active
 login.title,shared,LoginPage,LoginPage,title,"Sign in",,active
@@ -48,7 +48,7 @@ landing.hero.title_primary,landing,LandingPage,LandingPage,hero_title_primary,"T
 landing.hero.title_secondary,landing,LandingPage,LandingPage,hero_title_secondary,"AI TOKENS.",,active
 landing.hero.tagline,landing,LandingPage,LandingPage,hero_tagline,"UNIFIED USAGE DASHBOARD",,active
 landing.hero.subtagline,landing,LandingPage,LandingPage,hero_subtagline,"Automatically monitor token usage across Claude Code, Cursor, Codex, and more. Local-first, privacy-focused, and zero manual configuration.",,active
-landing.screenshot.alt,landing,LandingPage,LandingPage,screenshot_alt,"TokenTracker dashboard screenshot",,active
+landing.screenshot.alt,landing,LandingPage,LandingPage,screenshot_alt,"TokenUsage dashboard screenshot",,active
 landing.nav.login,landing,LandingPage,LandingPage,nav_login,"LOGIN",,active
 landing.nav.signup,landing,LandingPage,LandingPage,nav_signup,"SIGN UP",,active
 landing.nav.login_signup,landing,LandingPage,LandingPage,nav_login_signup,"SIGN IN / SIGN UP",,active
@@ -61,11 +61,11 @@ landing.install.helper,landing,LandingPage,LandingPage,install_helper,"Then run 
 landing.install.action.copy,landing,LandingPage,LandingPage,install_copy,"COPY COMMAND",,active
 landing.install.action.copied,landing,LandingPage,LandingPage,install_copied,"COPIED",,active
 landing.ai_agent.title,landing,LandingPage,LandingPage,ai_agent_title,"LET AI INSTALL FOR YOU",,active
-landing.ai_agent.description,landing,LandingPage,LandingPage,ai_agent_description,"Copy this guide and paste to ChatGPT, Claude, or any AI assistant. It will install TokenTracker automatically.",,active
-landing.ai_agent.command,landing,LandingPage,LandingPage,ai_agent_command,"https://github.com/mm7894215/TokenTracker/blob/main/docs/AI_AGENT_INSTALL.md",,active
+landing.ai_agent.description,landing,LandingPage,LandingPage,ai_agent_description,"Copy this guide and paste to ChatGPT, Claude, or any AI assistant. It will install TokenUsage automatically.",,active
+landing.ai_agent.command,landing,LandingPage,LandingPage,ai_agent_command,"https://github.com/mm7894215/TokenUsage/blob/main/docs/AI_AGENT_INSTALL.md",,active
 landing.ai_agent.copy_label,landing,LandingPage,LandingPage,ai_agent_copy_label,"Copy Guide Link",,active
 landing.ai_agent.helper,landing,LandingPage,LandingPage,ai_agent_helper,"Or click to open the guide and copy manually.",,active
-landing.ai_agent.guide_url,landing,LandingPage,LandingPage,ai_agent_guide_url,"https://github.com/mm7894215/TokenTracker/blob/main/docs/AI_AGENT_INSTALL.md",,active
+landing.ai_agent.guide_url,landing,LandingPage,LandingPage,ai_agent_guide_url,"https://github.com/mm7894215/TokenUsage/blob/main/docs/AI_AGENT_INSTALL.md",,active
 landing.meta.title,landing,LandingPage,Meta,title,"TokenUsage — Local Token Usage Dashboard for Codex and Claude Code",,active
 landing.meta.description,landing,LandingPage,Meta,description,"Local-first Windows dashboard for monitoring token usage across Codex and Claude Code, with persisted history and desktop widgets.",,active
 landing.meta.og_site_name,landing,LandingPage,Meta,og_site_name,"TokenUsage",,active
@@ -99,7 +99,7 @@ landing.cta.login_signup,landing,LandingPage,LandingPage,cta_login_signup,"Open 
 landing.footer.link.manifesto,landing,LandingPage,LandingPage,footer_link_manifesto,"Manifesto",,active
 landing.footer.link.docs,landing,LandingPage,LandingPage,footer_link_docs,"Docs",,active
 landing.footer.link.security,landing,LandingPage,LandingPage,footer_link_security,"Security",,active
-landing.footer.system_ready,landing,LandingPage,LandingPage,footer_system_ready,"System_Ready // 2024 TokenTracker OS",,active
+landing.footer.system_ready,landing,LandingPage,LandingPage,footer_system_ready,"System_Ready // 2024 TokenUsage OS",,active
 
 
 shell.header.title,ui,MatrixShell,MatrixShell,header_title,"VIBE USAGE",,active
@@ -132,7 +132,7 @@ landing.v2.install.mac_cta,landing,LandingPage,MarketingLanding,mac_cta,"MAC APP
 landing.v2.models.title,landing,LandingPage,MarketingLanding,models_title,"SUPPORTED AI CLI TOOLS",,active
 landing.v2.compare.kicker,landing,LandingPage,MarketingLanding,compare_kicker,"SEAMLESS TRACKING",,active
 landing.v2.compare.title,landing,LandingPage,MarketingLanding,compare_title,"Stop guessing your AI usage.",,active
-landing.v2.compare.subtitle,landing,LandingPage,MarketingLanding,compare_subtitle,"AI CLI tools hide your usage data in obscure local files. TokenTracker aggregates them into a single, beautiful dashboard in real-time.",,active
+landing.v2.compare.subtitle,landing,LandingPage,MarketingLanding,compare_subtitle,"AI CLI tools hide your usage data in obscure local files. TokenUsage aggregates them into a single, beautiful dashboard in real-time.",,active
 landing.v2.distill.body,landing,LandingPage,MarketingLanding,distill_body,"100% local processing. No prompts or code are ever collected.",,active
 landing.v2.compare.with.title,landing,LandingPage,MarketingLanding,with_title,"WITH TOKEN TRACKER",,active
 landing.v2.compare.with.p1,landing,LandingPage,MarketingLanding,with_p1,"Centralized usage dashboard",,active
@@ -142,7 +142,7 @@ landing.v2.compare.without.title,landing,LandingPage,MarketingLanding,without_ti
 landing.v2.compare.without.p1,landing,LandingPage,MarketingLanding,without_p1,"Scattered JSON log files",,active
 landing.v2.compare.without.p2,landing,LandingPage,MarketingLanding,without_p2,"Blind to token consumption",,active
 landing.v2.compare.without.p3,landing,LandingPage,MarketingLanding,without_p3,"Unexpected API bills",,active
-landing.v2.footer.line,landing,LandingPage,MarketingLanding,footer_line,"Token Tracker — Made by developers, for developers.",,active
+landing.v2.footer.line,landing,LandingPage,MarketingLanding,footer_line,"TokenUsage — Made by developers, for developers.",,active
 landing.v2.nav.github,landing,LandingPage,MarketingLanding,nav_github,"GITHUB",,active
 landing.v2.models.agent.codex,landing,LandingPage,MarketingLanding,agent_codex,"CODEX",,active
 landing.v2.models.agent.claude_code,landing,LandingPage,MarketingLanding,agent_claude_code,"CLAUDE CODE",,active
@@ -219,16 +219,16 @@ dashboard.projects.limit_top_6,ui,ProjectUsagePanel,ProjectUsagePanel,limit_top_
 dashboard.projects.limit_top_10,ui,ProjectUsagePanel,ProjectUsagePanel,limit_top_10,"TOP 10",,active
 dashboard.projects.empty,ui,ProjectUsagePanel,ProjectUsagePanel,empty,"No public repositories",,active
 dashboard.upgrade_alert.title,ui,UpgradeAlertModal,UpgradeAlertModal,title,"Update available",,active
-dashboard.upgrade_alert.subtitle,ui,UpgradeAlertModal,UpgradeAlertModal,subtitle,"TokenTracker v{{required}} is now available.",,active
-dashboard.upgrade_alert.subtitle_generic,ui,UpgradeAlertModal,UpgradeAlertModal,subtitle_generic,"A new version of TokenTracker is available.",,active
+dashboard.upgrade_alert.subtitle,ui,UpgradeAlertModal,UpgradeAlertModal,subtitle,"TokenUsage v{{required}} is now available.",,active
+dashboard.upgrade_alert.subtitle_generic,ui,UpgradeAlertModal,UpgradeAlertModal,subtitle_generic,"A new version of TokenUsage is available.",,active
 dashboard.upgrade_alert.prompt,ui,UpgradeAlertModal,UpgradeAlertModal,prompt,"$",,active
 dashboard.upgrade_alert.sparkle,ui,UpgradeAlertModal,UpgradeAlertModal,sparkle,"✨",,active
-dashboard.upgrade_alert.install_command,ui,UpgradeAlertModal,UpgradeAlertModal,install_command,"npx --yes tokentracker-cli init",,active
+dashboard.upgrade_alert.install_command,ui,UpgradeAlertModal,UpgradeAlertModal,install_command,"npx --yes tokenusage-cli init",,active
 dashboard.upgrade_alert.copy,ui,UpgradeAlertModal,UpgradeAlertModal,copy,"[ COPY ]",,active
 dashboard.upgrade_alert.copied,ui,UpgradeAlertModal,UpgradeAlertModal,copied,"[ COPIED ]",,active
 dashboard.upgrade_alert.ignore,ui,UpgradeAlertModal,UpgradeAlertModal,ignore,"Dismiss",,active
 dashboard.widgets.title,dashboard,DashboardPage,WidgetOnboardingCard,title,"Desktop Widgets",,active
-dashboard.widgets.hint,dashboard,DashboardPage,WidgetOnboardingCard,hint,"Right-click your desktop → Edit Widgets → search ""TokenTracker""",,active
+dashboard.widgets.hint,dashboard,DashboardPage,WidgetOnboardingCard,hint,"Right-click your desktop → Edit Widgets → search ""TokenUsage""",,active
 dashboard.widgets.dismiss_aria,dashboard,DashboardPage,WidgetOnboardingCard,dismiss_aria,"Dismiss widget intro",,active
 widgets.page.title,dashboard,WidgetsPage,WidgetsPage,title,"Widgets",,active
 widgets.page.subtitle,dashboard,WidgetsPage,WidgetsPage,subtitle,"Pin token usage to your menu bar and desktop.",,active
@@ -236,7 +236,7 @@ widgets.cta.open_gallery,dashboard,WidgetsPage,WidgetsPage,cta_open_gallery,"Ope
 widgets.cta.download,dashboard,WidgetsPage,WidgetsPage,cta_download,"Download Mac App",,active
 widgets.cta.macos_only,dashboard,WidgetsPage,WidgetsPage,cta_macos_only,"Windows local only",,active
 widgets.hero.aria,dashboard,WidgetsPage,WidgetsPage,hero_aria,"Usage widget preview",,active
-widgets.hero.annotation,dashboard,WidgetsPage,WidgetsPage,hero_annotation,"Right-click your desktop · Edit Widgets · search ""TokenTracker""",,active
+widgets.hero.annotation,dashboard,WidgetsPage,WidgetsPage,hero_annotation,"Right-click your desktop · Edit Widgets · search ""TokenUsage""",,active
 widgets.section.more,dashboard,WidgetsPage,WidgetsPage,section_more,"Also included",,active
 widgets.menubar.name,dashboard,WidgetsPage,MenuBarDisplayCard,name,"Menu Bar",,active
 widgets.menubar.description,dashboard,WidgetsPage,MenuBarDisplayCard,description,"Choose the two live fields shown beside the menu bar icon.",,active
@@ -422,7 +422,7 @@ dashboard.not_signed_in,dashboard,DashboardPage,Header,not_signed_in,"Not signed
 
 dashboard.footer.active,dashboard,DashboardPage,Footer,footer_active,"{{range}} • click Refresh to reload",,active
 dashboard.footer.auth,dashboard,DashboardPage,Footer,footer_auth,"Sign in to view usage",,active
-dashboard.footer.right,dashboard,DashboardPage,Footer,footer_right,"Token Tracker dashboard",,active
+dashboard.footer.right,dashboard,DashboardPage,Footer,footer_right,"TokenUsage dashboard",,active
 
 dashboard.auth_required.title,dashboard,DashboardPage,AsciiBox,title,"Authentication required",,active
 dashboard.auth_required.subtitle,dashboard,DashboardPage,AsciiBox,subtitle,"Sign in to continue",,active
@@ -432,7 +432,7 @@ dashboard.session_expired.title,dashboard,DashboardPage,AsciiBox,title,"Session 
 dashboard.session_expired.subtitle,dashboard,DashboardPage,AsciiBox,subtitle,"Sign in again",,active
 dashboard.session_expired.body,dashboard,DashboardPage,AsciiBox,body,"Your session expired.",,active
 dashboard.session_expired.body_tail,dashboard,DashboardPage,AsciiBox,body,"Sign in again to refresh private usage data.",,active
-dashboard.session_expired.copy_label,dashboard,DashboardPage,AsciiBox,body,"run npx --yes tokentracker-cli init",,active
+dashboard.session_expired.copy_label,dashboard,DashboardPage,AsciiBox,body,"run npx --yes tokenusage-cli init",,active
 dashboard.session_expired.copied,dashboard,DashboardPage,AsciiBox,body,"copied",,active
 
 dashboard.auth_optional.title,dashboard,DashboardPage,AsciiBox,title,"Connect your account",,active
@@ -442,14 +442,14 @@ dashboard.auth_optional.body,dashboard,DashboardPage,AsciiBox,body,"Sign in / si
 dashboard.install.title,dashboard,DashboardPage,AsciiBox,title,"Install",,active
 dashboard.install.subtitle,dashboard,DashboardPage,AsciiBox,subtitle,"CLI",,active
 dashboard.install.prompt,dashboard,DashboardPage,AsciiBox,install_prompt,"Install Node.js 18+ then run:",,active
-dashboard.install.cmd.init,dashboard,DashboardPage,AsciiBox,install_cmd,"npx --yes tokentracker-cli init",,active
-dashboard.install.cmd.init_link_code,dashboard,DashboardPage,AsciiBox,install_cmd,"npx --yes tokentracker-cli init --link-code {{link_code}}",,active
+dashboard.install.cmd.init,dashboard,DashboardPage,AsciiBox,install_cmd,"npx --yes tokenusage-cli init",,active
+dashboard.install.cmd.init_link_code,dashboard,DashboardPage,AsciiBox,install_cmd,"npx --yes tokenusage-cli init --link-code {{link_code}}",,active
 dashboard.install.copy,dashboard,DashboardPage,AsciiBox,install_copy,"Copy install command",,active
 dashboard.install.copy_base,dashboard,DashboardPage,AsciiBox,install_copy,"Copy init command",,active
 dashboard.install.copied,dashboard,DashboardPage,AsciiBox,install_copy,"Copied to clipboard",,active
 dashboard.install.link_code.loading,dashboard,DashboardPage,AsciiBox,install_status,"Generating private code...",,active
 dashboard.install.link_code.failed,dashboard,DashboardPage,AsciiBox,install_status,"Private code unavailable",,active
-dashboard.install.cmd.sync,dashboard,DashboardPage,AsciiBox,install_cmd,"npx --yes tokentracker-cli sync",,active
+dashboard.install.cmd.sync,dashboard,DashboardPage,AsciiBox,install_cmd,"npx --yes tokenusage-cli sync",,active
 
 dashboard.public_view.title,dashboard,DashboardPage,AsciiBox,title,"Public profile",,active
 dashboard.public_view.status.enabled,dashboard,DashboardPage,AsciiBox,status,"On",,active
@@ -519,7 +519,7 @@ settings.section.account,ui,SettingsPage,SettingsPage,sec_account,"Account",,act
 settings.section.limits,ui,SettingsPage,SettingsPage,sec_limits,"Limits Display",,active
 settings.section.limitsSubtitle,ui,SettingsPage,SettingsPage,sec_limits_sub,"Reorder providers and choose which ones appear on the Limits page.",,active
 settings.appearance.theme.label,ui,SettingsPage,SettingsPage,theme_label,"Theme",,active
-settings.appearance.theme.hint,ui,SettingsPage,SettingsPage,theme_hint,"Choose how Token Tracker looks across the dashboard.",,active
+settings.appearance.theme.hint,ui,SettingsPage,SettingsPage,theme_hint,"Choose how TokenUsage looks across the dashboard.",,active
 settings.appearance.theme.light,ui,SettingsPage,SettingsPage,theme_light,"Light",,active
 settings.appearance.theme.dark,ui,SettingsPage,SettingsPage,theme_dark,"Dark",,active
 settings.appearance.theme.system,ui,SettingsPage,SettingsPage,theme_system,"System",,active
@@ -529,7 +529,7 @@ settings.account.save,ui,SettingsPage,SettingsPage,save,"Save",,active
 settings.account.saving,ui,SettingsPage,SettingsPage,saving,"Saving...",,active
 settings.account.cancel,ui,SettingsPage,SettingsPage,cancel,"Cancel",,active
 settings.account.cloudSync,ui,SettingsPage,SettingsPage,cloud_sync,"Cloud sync",,active
-settings.account.cloudSyncHint,ui,SettingsPage,SettingsPage,cloud_sync_hint,"Upload local usage to your Token Tracker cloud account.",,active
+settings.account.cloudSyncHint,ui,SettingsPage,SettingsPage,cloud_sync_hint,"Upload local usage to your TokenUsage cloud account.",,active
 settings.account.publicProfile,ui,SettingsPage,SettingsPage,public_profile,"Public profile",,active
 settings.account.publicProfileHint,ui,SettingsPage,SettingsPage,public_profile_hint,"Show your usage on the public leaderboard.",,active
 settings.account.anonymous,ui,SettingsPage,SettingsPage,anonymous,"Anonymous",,active
@@ -543,7 +543,7 @@ settings.account.githubUrlInvalid,ui,SettingsPage,SettingsPage,github_url_invali
 leaderboard.github.aria,ui,LeaderboardPage,LeaderboardPage,github_aria,"Open GitHub profile",,active
 auth.callback.processing,ui,*,NativeAuthCallbackPage,processing,"Processing…",,active
 auth.callback.success,ui,*,NativeAuthCallbackPage,success,"Signed in successfully",,active
-auth.callback.redirecting,ui,*,NativeAuthCallbackPage,redirecting,"Returning to TokenTracker…",,active
+auth.callback.redirecting,ui,*,NativeAuthCallbackPage,redirecting,"Returning to TokenUsage…",,active
 auth.callback.failed,ui,*,NativeAuthCallbackPage,failed,"Sign-in incomplete. Please try again.",,active
 auth.callback.close,ui,*,NativeAuthCallbackPage,close,"Close this page",,active
 stats.period.today,ui,DashboardPage,StatsPanel,period_today,"today",,active
@@ -572,7 +572,7 @@ settings.menubar.showStatsHint,ui,SettingsPage,SettingsPage,mb_show_stats_hint,"
 settings.menubar.animatedIcon,ui,SettingsPage,SettingsPage,mb_anim,"Animated icon",,active
 settings.menubar.animatedIconHint,ui,SettingsPage,SettingsPage,mb_anim_hint,"Blink the Clawd character and play the syncing animation in the menu bar.",,active
 settings.menubar.launchAtLogin,ui,SettingsPage,SettingsPage,mb_login,"Launch at login",,active
-settings.menubar.launchAtLoginHint,ui,SettingsPage,SettingsPage,mb_login_hint,"Start TokenTrackerBar automatically when you sign in to macOS.",,active
+settings.menubar.launchAtLoginHint,ui,SettingsPage,SettingsPage,mb_login_hint,"Start TokenUsageBar automatically when you sign in to macOS.",,active
 settings.menubar.syncNow,ui,SettingsPage,SettingsPage,mb_sync_now,"Sync now",,active
 settings.menubar.syncNowHint,ui,SettingsPage,SettingsPage,mb_sync_now_hint,"Trigger an immediate parse and upload of local AI tool logs.",,active
 settings.menubar.syncing,ui,SettingsPage,SettingsPage,mb_syncing,"Syncing…",,active
@@ -582,7 +582,7 @@ settings.menubar.checkUpdates,ui,SettingsPage,SettingsPage,mb_check_updates,"Che
 menubar.preview.icon_only,ui,WidgetsPage,MenuBarDisplayCard,icon_only,"Icon only",,active
 menubar.slot.primary,ui,WidgetsPage,MenuBarDisplayCard,slot_primary,"Primary slot",,active
 menubar.slot.secondary,ui,WidgetsPage,MenuBarDisplayCard,slot_secondary,"Secondary slot",,active
-menubar.native_only,ui,WidgetsPage,MenuBarDisplayCard,native_only,"Open TokenTrackerBar for macOS to edit the live menu bar display.",,active
+menubar.native_only,ui,WidgetsPage,MenuBarDisplayCard,native_only,"Open TokenUsageBar for macOS to edit the live menu bar display.",,active
 menubar.metric.today_tokens,ui,WidgetsPage,MenuBarDisplayCard,metric_today_tokens,"Today Tokens",,active
 menubar.metric.today_cost,ui,WidgetsPage,MenuBarDisplayCard,metric_today_cost,"Today Cost",,active
 menubar.metric.last_7d_tokens,ui,WidgetsPage,MenuBarDisplayCard,metric_last_7d,"Last 7 Days",,active

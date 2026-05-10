@@ -4,7 +4,7 @@ const fs = require("node:fs/promises");
 const fssync = require("node:fs");
 const cp = require("node:child_process");
 
-const OPENCLAW_HOOK_NAME = "tokentracker-openclaw-sync";
+const OPENCLAW_HOOK_NAME = "tokenusage-openclaw-sync";
 const OPENCLAW_HOOK_DIRNAME = "openclaw-hook";
 
 function resolveOpenclawHookPaths({ home = os.homedir(), trackerDir, env = process.env } = {}) {
@@ -33,7 +33,7 @@ function resolveOpenclawHookPaths({ home = os.homedir(), trackerDir, env = proce
 async function installOpenclawHook({
   home = os.homedir(),
   trackerDir,
-  packageName = "tokentracker-cli",
+  packageName = "tokenusage-cli",
   env = process.env,
 } = {}) {
   const paths = resolveOpenclawHookPaths({ home, trackerDir, env });
@@ -64,7 +64,7 @@ async function installOpenclawHook({
 async function ensureOpenclawHookFiles({
   hookDir,
   trackerDir,
-  packageName = "tokentracker-cli",
+  packageName = "tokenusage-cli",
   openclawHome,
 } = {}) {
   if (!hookDir || !trackerDir) throw new Error("hookDir and trackerDir are required");
@@ -271,20 +271,20 @@ function runOpenclawCli(args, env = process.env) {
 function buildHookMarkdown() {
   return `---
 name: ${OPENCLAW_HOOK_NAME}
-description: "Trigger tokentracker sync when OpenClaw sessions roll over"
+description: "Trigger tokenusage sync when OpenClaw sessions roll over"
 metadata:
   { "openclaw": { "emoji": "📈", "events": ["command:new", "command:reset", "command:stop"], "requires": { "bins": ["node"] } } }
 ---
 
-# TokenTracker OpenClaw Sync Hook
+# TokenUsage OpenClaw Sync Hook
 
-Triggers non-blocking 'tokentracker sync --auto --from-openclaw' runs when OpenClaw command events indicate session rollover/reset/stop.
+Triggers non-blocking 'tokenusage sync --auto --from-openclaw' runs when OpenClaw command events indicate session rollover/reset/stop.
 `;
 }
 
-function buildHookHandler({ trackerDir, packageName = "tokentracker-cli", openclawHome }) {
+function buildHookHandler({ trackerDir, packageName = "tokenusage-cli", openclawHome }) {
   const trackerBinPath = path.join(trackerDir, "app", "bin", "tracker.js");
-  const fallbackPkg = packageName || "tokentracker-cli";
+  const fallbackPkg = packageName || "tokenusage-cli";
   const safeOpenclawHome = openclawHome || path.join(os.homedir(), ".openclaw");
 
   return (
