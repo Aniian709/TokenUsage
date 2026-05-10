@@ -1,5 +1,15 @@
 # TokenUsage
 
+<p align="center">
+  <img alt="Version" src="https://img.shields.io/badge/version-0.6.2-22c55e?style=for-the-badge" />
+  <img alt="Platform" src="https://img.shields.io/badge/platform-Windows-0ea5e9?style=for-the-badge" />
+  <img alt="Mode" src="https://img.shields.io/badge/mode-local--first-f97316?style=for-the-badge" />
+</p>
+
+<p align="center">
+  <a href="./README.md">English</a> · <a href="./README.zh-CN.md">中文</a>
+</p>
+
 `TokenUsage` is a Windows-first local dashboard for tracking token usage from `Codex` and `Claude Code`.
 
 It keeps the visual style of the original TokenTracker dashboard, but this repository is focused on local use:
@@ -8,6 +18,10 @@ It keeps the visual style of the original TokenTracker dashboard, but this repos
 - persisted local history
 - Windows desktop floating widgets
 - local usage limits, model breakdown, heatmap, and trend views
+
+## Version Notes
+
+- `v0.6.2` - Windows-first local dashboard, persisted history, widget overlays, and no login / no leaderboard.
 
 Repository:
 - [Aniian709/TokenUsage](https://github.com/Aniian709/TokenUsage)

@@ -1,5 +1,15 @@
 # TokenUsage
 
+<p align="center">
+  <img alt="Version" src="https://img.shields.io/badge/version-0.6.2-22c55e?style=for-the-badge" />
+  <img alt="Platform" src="https://img.shields.io/badge/platform-Windows-0ea5e9?style=for-the-badge" />
+  <img alt="Mode" src="https://img.shields.io/badge/mode-local--first-f97316?style=for-the-badge" />
+</p>
+
+<p align="center">
+  <a href="./README.md">English</a> · <a href="./README.zh-CN.md">中文</a>
+</p>
+
 `TokenUsage` 是一个以 Windows 本地使用为主的 `Codex` / `Claude Code` Token 用量监测面板。
 
 它保留了原始 TokenTracker 的整体视觉风格，但仓库当前面向的是本地使用场景：
@@ -8,6 +18,10 @@
 - 本地历史持久化
 - Windows 桌面悬浮小组件
 - 本地限额、模型占比、热力图、趋势图等能力
+
+## 版本说明
+
+- `v0.6.2`：Windows 本地优先版，支持历史持久化、桌面悬浮小组件，并移除了登录和排行榜。
 
 仓库地址：
 - [Aniian709/TokenUsage](https://github.com/Aniian709/TokenUsage)
