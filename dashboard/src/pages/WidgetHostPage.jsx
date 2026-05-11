@@ -589,14 +589,14 @@ function MenuBarWidgetHost() {
 
   return (
     <WidgetShell kind="menubar" appearanceOpacity={appearance.opacity}>
-      <div className="flex h-full items-center justify-center px-[8px] text-white">
+      <div className="flex h-full items-center justify-center px-[10px] text-white">
         <div className="inline-flex items-stretch">
-          <div className="flex items-center pl-[2px] pr-[9px]">
+          <div className="relative z-20 flex items-center pl-[6px] pr-[7px]">
             {menuBar.animatedIcon ? (
               <div
-                className="flex h-[44px] w-[62px] items-center justify-center overflow-hidden"
+                className="flex h-[44px] w-[62px] items-center justify-center overflow-visible"
                 style={{
-                  transform: `translate(${clawdPresentation.offsetX}px, ${clawdPresentation.offsetY}px) scale(${clawdPresentation.scale * adaptiveScale})`,
+                  transform: `translate(${clawdPresentation.offsetX + 4}px, ${clawdPresentation.offsetY}px) scale(${clawdPresentation.scale * adaptiveScale})`,
                   transformOrigin: "center center",
                 }}
               >
@@ -619,7 +619,7 @@ function MenuBarWidgetHost() {
             )}
           </div>
           {menuBar.showStats ? (
-            <div className="inline-flex items-stretch">
+            <div className="relative z-10 inline-flex items-stretch">
               {displayItems.map((itemId, index) => {
                 const item = valueMap[itemId] || { value: "--", label: "ITEM" };
                 return (
@@ -630,7 +630,7 @@ function MenuBarWidgetHost() {
                       className={
                         index === 0
                           ? "flex min-w-[50px] flex-col items-center justify-center pb-[7px] pt-[8px] pr-[2px]"
-                          : "flex min-w-[54px] flex-col items-center justify-center pb-[7px] pt-[8px] pl-[1px] pr-[3px]"
+                          : "flex min-w-[60px] -translate-x-[6px] flex-col items-center justify-center pb-[7px] pt-[8px] pl-[1px] pr-[14px]"
                       }
                     >
                       <div className="text-[15px] font-bold leading-none text-white">{item.value}</div>
