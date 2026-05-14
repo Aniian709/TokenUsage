@@ -90,6 +90,7 @@ dist/
 build/
 .tmp/
 *.tsbuildinfo
+token.pid
 
 # InsForge & AI agent skills
 .insforge
