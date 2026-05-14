@@ -96,6 +96,16 @@ cd ..
 
 ## Start the App
 
+Recommended for normal users:
+
+```text
+Double-click TokenUsage.cmd
+```
+
+It starts the local dashboard in a normal Windows terminal window and works regardless of where you place the project folder.
+
+Manual alternative:
+
 Run:
 
 ```powershell
@@ -107,8 +117,6 @@ Then open:
 ```text
 http://127.0.0.1:7680
 ```
-
-If you created your own launcher script such as `token`, you can also use that local alias instead.
 
 ## How to Use
 
