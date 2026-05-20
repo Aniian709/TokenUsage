@@ -110,17 +110,47 @@ cd TokenUsage
 
 Or download the repository ZIP from GitHub, extract it, then open a terminal in the extracted `TokenUsage` folder.
 
-### 3. Install Dependencies
+### 3. Start TokenUsage
 
-Run this in the project root:
+The repository includes prebuilt frontend files in `dashboard/dist`, and the local dashboard uses Node.js built-in modules. For normal use, you do not need to run `npm install`.
 
-```powershell
-npm install
+Double-click:
+
+```text
+TokenUsage.cmd
 ```
 
-This installs the local backend and desktop widget dependencies.
+Or run:
 
-### 4. Optional: Create Desktop Shortcuts
+```powershell
+node .\bin\tracker.js serve
+```
+
+Then open:
+
+```text
+http://127.0.0.1:7680
+```
+
+### 4. Optional: Install Desktop Widget Runtime
+
+Desktop widgets use Electron. Install this optional runtime only if you want always-on-top desktop cards:
+
+Double-click:
+
+```text
+InstallWidgetsRuntime.cmd
+```
+
+Or run:
+
+```powershell
+npm run widgets:install
+```
+
+This installer uses an Electron mirror by default. If Electron download is still blocked by your network, the main dashboard still works without widgets. Close any running `node.exe` / `TokenUsage` process, then retry after changing network or proxy settings.
+
+### 5. Optional: Create Desktop Shortcuts
 
 Double-click:
 
@@ -374,6 +404,18 @@ If it still fails, start from terminal so you can read the error:
 ```powershell
 node .\bin\tracker.js serve
 ```
+
+### `npm install` Fails While Installing Electron
+
+If you see errors like `RequestError: connect ETIMEDOUT ...:443` under `node_modules\electron`, Electron download was blocked or timed out. This does not block the main dashboard.
+
+Use the dedicated widget installer instead:
+
+```text
+InstallWidgetsRuntime.cmd
+```
+
+If you also see `EPERM: operation not permitted, rmdir ... node_modules`, close terminals, editors, antivirus scans, or any running `node.exe`, delete `node_modules`, then run `InstallWidgetsRuntime.cmd` again.
 
 ### Port 7680 Is Already in Use
 

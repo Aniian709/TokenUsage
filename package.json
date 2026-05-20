@@ -12,8 +12,10 @@
   "files": [
     "bin/",
     "src/",
+    "scripts/",
     "dashboard/dist/",
     "CreateDesktopShortcuts.cmd",
+    "InstallWidgetsRuntime.cmd",
     "TokenUsage.cmd",
     "TokenUsageStop.cmd",
     "LICENSE",
@@ -26,12 +28,8 @@
   "scripts": {
     "start": "node bin/tracker.js serve",
     "dashboard:build": "npm --prefix dashboard run build",
-    "dashboard:dev": "npm --prefix dashboard run dev"
-  },
-  "devDependencies": {
-    "@sourcegraph/scip-typescript": "^0.3.6",
-    "electron": "^41.5.0",
-    "esbuild": "0.27.2"
+    "dashboard:dev": "npm --prefix dashboard run dev",
+    "widgets:install": "node scripts/install-widgets-runtime.js"
   },
   "repository": {
     "type": "git",

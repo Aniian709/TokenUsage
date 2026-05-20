@@ -229,7 +229,14 @@ async function ensureOverlayHostRunning({
   const existingPid = await readPid(pidPath);
   if (existingPid && isProcessAlive(existingPid)) return existingPid;
 
-  const electronBinary = require("electron");
+  let electronBinary;
+  try {
+    electronBinary = require("electron");
+  } catch {
+    throw new Error(
+      "Desktop widgets require Electron. Run `InstallWidgetsRuntime.cmd` or `npm run widgets:install` in the TokenUsage folder, then restart TokenUsage.",
+    );
+  }
   const hostMain = path.join(__dirname, "../desktop/widget-host-main.js");
   const child = spawn(electronBinary, [hostMain], {
     detached: true,

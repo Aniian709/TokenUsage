@@ -110,17 +110,47 @@ cd TokenUsage
 
 也可以在 GitHub 下载 ZIP，解压后在解压出的 `TokenUsage` 文件夹中打开终端。
 
-### 3. 安装依赖
+### 3. 启动 TokenUsage
 
-在项目根目录运行：
+仓库已经包含 `dashboard/dist` 前端构建产物，本地仪表盘只使用 Node.js 内置模块。正常使用不需要运行 `npm install`。
 
-```powershell
-npm install
+双击：
+
+```text
+TokenUsage.cmd
 ```
 
-这一步会安装本地后端和桌面小组件所需的依赖。
+或在终端运行：
 
-### 4. 可选：创建桌面快捷方式
+```powershell
+node .\bin\tracker.js serve
+```
+
+然后打开：
+
+```text
+http://127.0.0.1:7680
+```
+
+### 4. 可选：安装桌面小组件运行时
+
+桌面小组件需要 Electron。只有需要置顶桌面卡片时才安装：
+
+双击：
+
+```text
+InstallWidgetsRuntime.cmd
+```
+
+或运行：
+
+```powershell
+npm run widgets:install
+```
+
+这个安装器默认使用 Electron 镜像。如果 Electron 下载仍被网络拦截或超时，主仪表盘仍可正常使用，只是桌面小组件暂时不可用。关闭正在运行的 `node.exe` / `TokenUsage` 后，调整网络或代理再重试。
+
+### 5. 可选：创建桌面快捷方式
 
 双击：
 
@@ -168,6 +198,18 @@ TokenUsage.cmd
 ```powershell
 node .\bin\tracker.js serve
 ```
+
+### `npm install` 在安装 Electron 时报错
+
+如果看到 `node_modules\electron` 下的 `RequestError: connect ETIMEDOUT ...:443`，说明 Electron 下载被网络拦截或超时。这不会影响主仪表盘。
+
+请改用专用的小组件运行时安装器：
+
+```text
+InstallWidgetsRuntime.cmd
+```
+
+如果同时看到 `EPERM: operation not permitted, rmdir ... node_modules`，说明 Windows 有进程占用了目录。关闭终端、编辑器、杀毒扫描或正在运行的 `node.exe`，删除 `node_modules` 后重新运行 `InstallWidgetsRuntime.cmd`。
 
 然后打开：
 
