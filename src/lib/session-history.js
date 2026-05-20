@@ -1,3 +1,4 @@
+const crypto = require("node:crypto");
 const fs = require("node:fs/promises");
 const os = require("node:os");
 const path = require("node:path");
@@ -13,7 +14,7 @@ const TOKEN_FIELDS = [
 ];
 
 const CACHE_TTL_MS = 5000;
-const SNAPSHOT_VERSION = 1;
+const SNAPSHOT_VERSION = 2;
 
 let memoryCache = {
   homeDir: null,
@@ -36,11 +37,13 @@ async function loadSessionUsageRows({ homeDir = os.homedir(), forceRefresh = fal
   await syncSourceFiles({
     files: await collectCodexSessionFiles(homeDir),
     snapshot,
+    source: "codex",
     parseFile: parseCodexFile,
   });
   await syncSourceFiles({
     files: await collectClaudeSessionFiles(homeDir),
     snapshot,
+    source: "claude",
     parseFile: parseClaudeFile,
   });
 
@@ -55,7 +58,8 @@ async function loadSessionUsageRows({ homeDir = os.homedir(), forceRefresh = fal
   return cloneRows(rows);
 }
 
-async function syncSourceFiles({ files, snapshot, parseFile }) {
+async function syncSourceFiles({ files, snapshot, source, parseFile }) {
+  const seenFiles = new Set(files);
   for (const filePath of files) {
     const stat = await safeStat(filePath);
     if (!stat) continue;
@@ -70,26 +74,42 @@ async function syncSourceFiles({ files, snapshot, parseFile }) {
       previousMeta &&
       previousMeta.version === SNAPSHOT_VERSION &&
       previousMeta.size === fingerprint.size &&
-      previousMeta.mtimeMs === fingerprint.mtimeMs
+      previousMeta.mtimeMs === fingerprint.mtimeMs &&
+      previousMeta.missing !== true
     ) {
       continue;
     }
 
-    removeEventIds(snapshot, previousMeta?.eventIds || []);
-
     const events = await parseFile(filePath);
-    const eventIds = [];
+    const eventIds = new Set(Array.isArray(previousMeta?.eventIds) ? previousMeta.eventIds : []);
     for (const event of events) {
       if (!event?.request_id) continue;
       snapshot.events[event.request_id] = event;
-      eventIds.push(event.request_id);
+      eventIds.add(event.request_id);
     }
 
     snapshot.files[filePath] = {
       version: SNAPSHOT_VERSION,
+      source: source || previousMeta?.source || inferSourceFromFilePath(filePath),
       size: fingerprint.size,
       mtimeMs: fingerprint.mtimeMs,
-      eventIds,
+      eventIds: Array.from(eventIds),
+      firstSeenAt: previousMeta?.firstSeenAt || new Date().toISOString(),
+      lastSeenAt: new Date().toISOString(),
+      missing: false,
+      missingSince: null,
+    };
+  }
+
+  for (const [filePath, meta] of Object.entries(snapshot.files || {})) {
+    if ((meta?.source || inferSourceFromFilePath(filePath)) !== source) continue;
+    if (seenFiles.has(filePath)) continue;
+    snapshot.files[filePath] = {
+      ...meta,
+      version: SNAPSHOT_VERSION,
+      source: meta?.source || source,
+      missing: true,
+      missingSince: meta?.missingSince || new Date().toISOString(),
     };
   }
 }
@@ -166,8 +186,9 @@ async function parseCodexFile(filePath) {
     if (!hourStart) continue;
 
     eventIndex += 1;
+    const requestId = buildCodexEventId({ sessionId, filePath, eventIndex });
     events.push({
-      request_id: `codex_session:${sessionId || "unknown"}:${eventIndex}`,
+      request_id: requestId,
       source: "codex",
       model: currentModel || "unknown",
       hour_start: hourStart,
@@ -278,8 +299,17 @@ async function collectJsonlFilesRecursive(dirPath, files) {
 
 function aggregateEventsToRows(events) {
   const byBucket = new Map();
+  const byEventId = new Map();
 
   for (const event of events) {
+    const eventId = normalizeSnapshotEventId(event?.request_id, event);
+    byEventId.set(eventId || event?.request_id || `${byEventId.size}`, {
+      ...event,
+      request_id: eventId || event?.request_id,
+    });
+  }
+
+  for (const event of byEventId.values()) {
     const source = event?.source || "unknown";
     const model = event?.model || "unknown";
     const hourStart = event?.hour_start;
@@ -461,35 +491,16 @@ function toUtcHalfHourStart(timestamp) {
   return bucket.toISOString();
 }
 
-function removeEventIds(snapshot, eventIds) {
-  for (const eventId of Array.isArray(eventIds) ? eventIds : []) {
-    delete snapshot.events[eventId];
-  }
-}
-
 async function readSnapshot(homeDir) {
   const snapshotPath = resolveSnapshotPath(homeDir);
   try {
     const raw = await fs.readFile(snapshotPath, "utf8");
     const parsed = JSON.parse(raw);
-    if (
-      parsed &&
-      parsed.version === SNAPSHOT_VERSION &&
-      parsed.files &&
-      typeof parsed.files === "object" &&
-      parsed.events &&
-      typeof parsed.events === "object"
-    ) {
-      return parsed;
-    }
+    return normalizeSnapshot(parsed);
   } catch {
     // fall through
   }
-  return {
-    version: SNAPSHOT_VERSION,
-    files: {},
-    events: {},
-  };
+  return createEmptySnapshot();
 }
 
 async function writeSnapshot(homeDir, snapshot) {
@@ -503,6 +514,134 @@ async function writeSnapshot(homeDir, snapshot) {
 
 function resolveSnapshotPath(homeDir) {
   return path.join(resolveTrackerRootDir(homeDir), "cache", "session-history-cache.json");
+}
+
+function createEmptySnapshot() {
+  return {
+    version: SNAPSHOT_VERSION,
+    files: {},
+    events: {},
+  };
+}
+
+function normalizeSnapshot(parsed) {
+  if (!parsed || typeof parsed !== "object") {
+    return createEmptySnapshot();
+  }
+
+  const rawFiles =
+    parsed.files && typeof parsed.files === "object" && !Array.isArray(parsed.files)
+      ? parsed.files
+      : {};
+  const rawEvents =
+    parsed.events && typeof parsed.events === "object" && !Array.isArray(parsed.events)
+      ? parsed.events
+      : {};
+
+  const files = {};
+  for (const [filePath, meta] of Object.entries(rawFiles)) {
+    if (!meta || typeof meta !== "object") continue;
+    files[filePath] = {
+      version: SNAPSHOT_VERSION,
+      source: typeof meta.source === "string" && meta.source.trim()
+        ? meta.source.trim()
+        : inferSourceFromFilePath(filePath),
+      size: toNonNegativeInt(meta.size),
+      mtimeMs: toNonNegativeInt(meta.mtimeMs),
+      eventIds: Array.from(
+        new Set((Array.isArray(meta.eventIds) ? meta.eventIds : []).filter((id) => typeof id === "string" && id)),
+      ),
+      firstSeenAt: normalizeIsoString(meta.firstSeenAt),
+      lastSeenAt: normalizeIsoString(meta.lastSeenAt),
+      missing: meta.missing === true,
+      missingSince: meta.missing === true ? normalizeIsoString(meta.missingSince) : null,
+    };
+  }
+
+  const events = {};
+  const eventIdMap = new Map();
+  for (const [eventId, event] of Object.entries(rawEvents)) {
+    if (!event || typeof event !== "object") continue;
+    const nextEventId = normalizeSnapshotEventId(eventId, event);
+    eventIdMap.set(eventId, nextEventId);
+    events[nextEventId] = {
+      ...event,
+      request_id: nextEventId,
+    };
+  }
+
+  if (eventIdMap.size > 0) {
+    for (const meta of Object.values(files)) {
+      meta.eventIds = Array.from(
+        new Set(meta.eventIds.map((eventId) => eventIdMap.get(eventId) || eventId)),
+      );
+    }
+  }
+
+  return {
+    version: SNAPSHOT_VERSION,
+    files,
+    events,
+  };
+}
+
+function inferSourceFromFilePath(filePath) {
+  const normalized = String(filePath || "").toLowerCase();
+  if (normalized.includes(`${path.sep}.claude${path.sep}`) || normalized.includes("/.claude/")) {
+    return "claude";
+  }
+  return "codex";
+}
+
+function buildCodexEventId({ sessionId, filePath, eventIndex }) {
+  const sessionPart = String(sessionId || "unknown").trim() || "unknown";
+  return `codex_session:${sessionPart}:file_${stablePathHash(filePath)}:${eventIndex}`;
+}
+
+function normalizeSnapshotEventId(eventId, event) {
+  const source = event?.source || inferSourceFromFilePath(event?.file_path);
+  if (source !== "codex") return eventId;
+  if (isNewCodexEventId(eventId)) return eventId;
+
+  const parts = String(eventId || "").split(":");
+  if (parts[0] !== "codex_session" || !event?.file_path) return eventId;
+
+  let sessionId = null;
+  let eventIndex = null;
+  if (parts.length === 3) {
+    sessionId = parts[1];
+    eventIndex = Number(parts[2]);
+  } else if (parts.length === 4 && /^[a-f0-9]{12}$/u.test(parts[2])) {
+    sessionId = parts[1];
+    eventIndex = Number(parts[3]);
+  }
+
+  if (!sessionId || !Number.isFinite(eventIndex)) return eventId;
+
+  return buildCodexEventId({
+    sessionId,
+    filePath: event.file_path,
+    eventIndex,
+  });
+}
+
+function isNewCodexEventId(eventId) {
+  return /^codex_session:.*:file_[a-f0-9]{12}:\d+$/u.test(String(eventId || ""));
+}
+
+function stablePathHash(filePath) {
+  return crypto
+    .createHash("sha1")
+    .update(String(filePath || "").toLowerCase())
+    .digest("hex")
+    .slice(0, 12);
+}
+
+function normalizeIsoString(value) {
+  if (typeof value !== "string" || !value.trim()) return null;
+  const date = new Date(value);
+  if (!Number.isFinite(date.getTime())) return null;
+  return date.toISOString();
 }
 
 async function safeStat(filePath) {

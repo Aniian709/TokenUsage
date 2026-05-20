@@ -8,7 +8,7 @@ function resolveTrackerRootDir(home = os.homedir()) {
 }
 
 function resolveLegacyTrackerRootDir(home = os.homedir()) {
-  return path.join(home, ".tokenusage");
+  return path.join(home, ".tokentracker");
 }
 
 async function pathExists(targetPath) {
@@ -40,6 +40,52 @@ async function createLegacyCompatibilityLink({ home = os.homedir() } = {}) {
   }
 }
 
+async function removeLegacyCompatibilityLink({ home = os.homedir() } = {}) {
+  const legacyRoot = resolveLegacyTrackerRootDir(home);
+  if (!(await pathExists(legacyRoot))) return;
+  if (!(await isSymlink(legacyRoot))) return;
+  await fsp.rm(legacyRoot, { recursive: true, force: true }).catch(() => {});
+}
+
+async function mergeLegacyIntoCurrent({ legacyRoot, rootDir }) {
+  await fsp.mkdir(rootDir, { recursive: true });
+
+  const entries = await fsp.readdir(legacyRoot, { withFileTypes: true });
+  for (const entry of entries) {
+    const fromPath = path.join(legacyRoot, entry.name);
+    const toPath = path.join(rootDir, entry.name);
+
+    if (entry.isDirectory()) {
+      if (await pathExists(toPath)) {
+        await mergeLegacyIntoCurrent({ legacyRoot: fromPath, rootDir: toPath });
+      } else {
+        await fsp.cp(fromPath, toPath, {
+          recursive: true,
+          force: false,
+          preserveTimestamps: true,
+        });
+      }
+      continue;
+    }
+
+    if (entry.isFile()) {
+      if (await pathExists(toPath)) continue;
+      await fsp.copyFile(fromPath, toPath);
+      continue;
+    }
+
+    if (entry.isSymbolicLink()) {
+      if (await pathExists(toPath)) continue;
+      try {
+        const target = await fsp.readlink(fromPath);
+        await fsp.symlink(target, toPath, "junction");
+      } catch {
+        // Ignore legacy links we cannot recreate.
+      }
+    }
+  }
+}
+
 async function migrateTrackerRoot({ home = os.homedir() } = {}) {
   const rootDir = resolveTrackerRootDir(home);
   const legacyRoot = resolveLegacyTrackerRootDir(home);
@@ -48,7 +94,14 @@ async function migrateTrackerRoot({ home = os.homedir() } = {}) {
   const hasOld = await pathExists(legacyRoot);
 
   if (hasNew) {
-    await createLegacyCompatibilityLink({ home });
+    if (hasOld) {
+      if (await isSymlink(legacyRoot)) {
+        await removeLegacyCompatibilityLink({ home });
+      } else {
+        await mergeLegacyIntoCurrent({ legacyRoot, rootDir });
+        await fsp.rm(legacyRoot, { recursive: true, force: true });
+      }
+    }
     return rootDir;
   }
 
@@ -80,7 +133,6 @@ async function migrateTrackerRoot({ home = os.homedir() } = {}) {
     await fsp.rm(legacyRoot, { recursive: true, force: true });
   }
 
-  await createLegacyCompatibilityLink({ home });
   return rootDir;
 }
 

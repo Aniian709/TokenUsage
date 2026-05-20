@@ -118,6 +118,8 @@ Then open:
 http://127.0.0.1:7680
 ```
 
+If you created your own launcher script such as `token`, you can also use that local alias instead.
+
 ## How to Use
 
 ### Dashboard
