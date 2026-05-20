@@ -399,17 +399,20 @@ function HeatmapWidgetHost() {
     <WidgetShell appearanceOpacity={appearance.opacity}>
       <div className="flex h-full flex-col justify-between px-[19px] pb-[15px] pt-[13px] text-white">
         <div className="flex justify-center">
-          <div
-            className="grid gap-[1.4px]"
-            style={{ gridTemplateColumns: "repeat(30, 6.2px)" }}
-          >
+          <div className="grid grid-flow-col grid-rows-7 gap-[1.2px]" style={{ gridAutoColumns: "6.2px" }}>
             {dayColumns.map((cell, dayIndex) => (
-              <div
-                key={cell?.day || `empty-${dayIndex}`}
-                className="h-[54px] w-[6.2px] rounded-[2px] ring-1 ring-white/[0.03]"
-                style={{ background: heatmapFillForLevel(cell?.level) }}
-                title={cell?.day}
-              />
+              Array.from({ length: 7 }).map((_, rowIndex) => {
+                const level = Number(cell?.level || 0);
+                const filled = level > 0 && rowIndex >= 7 - Math.max(1, Math.min(7, level + 1));
+                return (
+                  <div
+                    key={`${cell?.day || `empty-${dayIndex}`}-${rowIndex}`}
+                    className="h-[6.2px] w-[6.2px] rounded-[1.4px] ring-1 ring-white/[0.03]"
+                    style={{ background: filled ? heatmapFillForLevel(level) : heatmapFillForLevel(0) }}
+                    title={cell?.day}
+                  />
+                );
+              })
             ))}
           </div>
         </div>
