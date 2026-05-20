@@ -75,13 +75,13 @@ function buildHourlyTrendPoints(hourlyRows) {
   const firstActiveHour = hourly.findIndex((value) => value > 0);
   if (firstActiveHour < 0) return [0, 0];
 
-  const cumulative = [0];
   let running = 0;
+  const cumulative = [];
   for (const value of hourly.slice(firstActiveHour)) {
     running += value;
     cumulative.push(running);
   }
-  return cumulative.length >= 2 ? cumulative : [0, 0];
+  return cumulative.length >= 2 ? cumulative : [running, running];
 }
 
 function buildSparklinePath(values, width = 264, height = 44, paddingY = 7) {
@@ -374,7 +374,7 @@ function HeatmapWidgetHost() {
     5000,
     useMemo(
       () => async (active) => {
-        const res = await getUsageHeatmap({ weeks: 4, weekStartsOn: "sun" });
+        const res = await getUsageHeatmap({ weeks: 5, weekStartsOn: "sun" });
         if (!active) return;
         const nextCells = Array.isArray(res?.weeks) ? res.weeks.flat() : [];
         const totalTokens = nextCells
@@ -386,35 +386,31 @@ function HeatmapWidgetHost() {
     ),
   );
 
-  const weeks = useMemo(() => {
+  const dayColumns = useMemo(() => {
     const emptyCell = { empty: true, level: 0 };
-    const normalized = cells.slice(-28);
-    const padded = [
-      ...Array.from({ length: Math.max(0, 28 - normalized.length) }, () => emptyCell),
+    const normalized = cells.slice(-30);
+    return [
+      ...Array.from({ length: Math.max(0, 30 - normalized.length) }, () => emptyCell),
       ...normalized,
     ];
-    const grouped = [];
-    for (let index = 0; index < padded.length; index += 7) {
-      grouped.push(padded.slice(index, index + 7));
-    }
-    return grouped;
   }, [cells]);
 
   return (
     <WidgetShell appearanceOpacity={appearance.opacity}>
       <div className="flex h-full flex-col justify-between px-[19px] pb-[15px] pt-[13px] text-white">
         <div className="flex justify-center">
-          <div className="grid grid-flow-col grid-rows-7 gap-[1.5px]" style={{ gridAutoColumns: "7.5px" }}>
-            {weeks.map((week, weekIndex) =>
-              week.map((cell, dayIndex) => (
-                <div
-                  key={cell?.day || `empty-${weekIndex}-${dayIndex}`}
-                  className="h-[7.5px] w-[7.5px] rounded-[1.5px] ring-1 ring-white/[0.03]"
-                  style={{ background: heatmapFillForLevel(cell?.level) }}
-                  title={cell?.day}
-                />
-              )),
-            )}
+          <div
+            className="grid gap-[1.4px]"
+            style={{ gridTemplateColumns: "repeat(30, 6.2px)" }}
+          >
+            {dayColumns.map((cell, dayIndex) => (
+              <div
+                key={cell?.day || `empty-${dayIndex}`}
+                className="h-[54px] w-[6.2px] rounded-[2px] ring-1 ring-white/[0.03]"
+                style={{ background: heatmapFillForLevel(cell?.level) }}
+                title={cell?.day}
+              />
+            ))}
           </div>
         </div>
         <div className="whitespace-nowrap text-[8px] leading-none text-white/62">
