@@ -68,9 +68,13 @@ function createOverlayWindow(kind, config, appearance) {
 
 async function applyOverlayConfig() {
   const overlayConfig = await readOverlayConfig({ home });
+  const mergedBounds = mergeCurrentWindowBounds(overlayConfig);
+  if (mergedBounds.changed) {
+    await writeOverlayConfig(mergedBounds.config, { home });
+  }
   const enabledKinds = new Set();
 
-  for (const [kind, widgetConfig] of Object.entries(overlayConfig.windows || {})) {
+  for (const [kind, widgetConfig] of Object.entries(mergedBounds.config.windows || {})) {
     if (!widgetConfig?.enabled) {
       const existing = windows.get(kind);
       if (existing) existing.close();
@@ -80,7 +84,7 @@ async function applyOverlayConfig() {
     enabledKinds.add(kind);
     const existing = windows.get(kind);
     if (existing && !existing.isDestroyed()) {
-      const scale = overlayConfig.appearance?.scale || 1;
+      const scale = mergedBounds.config.appearance?.scale || 1;
       existing.setBounds({
         x: widgetConfig.x,
         y: widgetConfig.y,
@@ -88,13 +92,13 @@ async function applyOverlayConfig() {
         height: Math.round(widgetConfig.height * scale),
       });
       existing.setOpacity(1);
-      existing.setIgnoreMouseEvents(Boolean(overlayConfig.appearance?.clickThrough), {
+      existing.setIgnoreMouseEvents(Boolean(mergedBounds.config.appearance?.clickThrough), {
         forward: true,
       });
       continue;
     }
 
-    windows.set(kind, createOverlayWindow(kind, widgetConfig, overlayConfig.appearance));
+    windows.set(kind, createOverlayWindow(kind, widgetConfig, mergedBounds.config.appearance));
   }
 
   for (const [kind, win] of windows.entries()) {
@@ -102,6 +106,30 @@ async function applyOverlayConfig() {
       win.close();
     }
   }
+}
+
+function mergeCurrentWindowBounds(overlayConfig) {
+  let changed = false;
+  const nextConfig = {
+    ...overlayConfig,
+    windows: { ...(overlayConfig.windows || {}) },
+  };
+
+  for (const [kind, win] of windows.entries()) {
+    if (!win || win.isDestroyed()) continue;
+    const current = nextConfig.windows?.[kind];
+    if (!current) continue;
+    const bounds = win.getBounds();
+    if (current.x === bounds.x && current.y === bounds.y) continue;
+    nextConfig.windows[kind] = {
+      ...current,
+      x: bounds.x,
+      y: bounds.y,
+    };
+    changed = true;
+  }
+
+  return { config: nextConfig, changed };
 }
 
 async function installWatcher() {

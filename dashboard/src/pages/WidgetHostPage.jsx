@@ -63,16 +63,22 @@ function usageTokenValue(row) {
 function buildHourlyTrendPoints(hourlyRows) {
   const now = new Date();
   const currentHour = now.getHours();
-  const values = Array.from({ length: currentHour + 1 }, () => 0);
+  const hourly = Array.from({ length: currentHour + 1 }, () => 0);
 
   for (const row of Array.isArray(hourlyRows) ? hourlyRows : []) {
     const match = String(row?.hour || "").match(/T(\d{2}):/);
     const hour = match ? Number(match[1]) : NaN;
     if (!Number.isInteger(hour) || hour < 0 || hour > currentHour) continue;
-    values[hour] += usageTokenValue(row);
+    hourly[hour] += usageTokenValue(row);
   }
 
-  return values.length >= 2 ? values : [0, values[0] || 0];
+  const cumulative = [0];
+  let running = 0;
+  for (const value of hourly) {
+    running += value;
+    cumulative.push(running);
+  }
+  return cumulative.length >= 2 ? cumulative : [0, 0];
 }
 
 function buildSparklinePath(values, width = 264, height = 44, paddingY = 7) {
@@ -105,7 +111,7 @@ function buildSparklinePath(values, width = 264, height = 44, paddingY = 7) {
 
 function heatmapFillForLevel(level) {
   const normalized = Math.max(0, Math.min(4, Number(level || 0)));
-  if (normalized <= 0) return "#262626";
+  if (normalized <= 0) return "rgba(255,255,255,0.12)";
   return [
     "rgba(10, 132, 255, 0.28)",
     "rgba(10, 132, 255, 0.50)",
@@ -379,7 +385,8 @@ function HeatmapWidgetHost() {
 
   const paddedCells = useMemo(() => {
     const visible = cells.slice(-30);
-    return [...Array.from({ length: Math.max(0, 35 - visible.length) }, () => null), ...visible];
+    const emptyCell = { empty: true, level: 0 };
+    return [...Array.from({ length: Math.max(0, 35 - visible.length) }, () => emptyCell), ...visible];
   }, [cells]);
 
   return (
@@ -387,14 +394,14 @@ function HeatmapWidgetHost() {
       <div className="flex h-full flex-col justify-between px-[17px] pb-[13px] pt-[13px] text-white">
         <div className="flex justify-center">
           <div
-            className="grid grid-flow-col grid-cols-5 grid-rows-7 gap-[3px]"
+            className="grid grid-flow-col grid-cols-5 grid-rows-7 gap-[2.5px]"
             style={{ gridAutoFlow: "column" }}
           >
             {paddedCells.map((cell, cellIndex) => (
               <div
                 key={cell?.day || `empty-${cellIndex}`}
-                className="h-[10px] w-[10px] rounded-[2px]"
-                style={{ background: cell ? heatmapFillForLevel(cell.level) : "transparent" }}
+                className="h-[10px] w-[10px] rounded-[2px] ring-1 ring-white/[0.035]"
+                style={{ background: heatmapFillForLevel(cell?.level) }}
                 title={cell?.day}
               />
             ))}
@@ -433,33 +440,33 @@ function TopModelsWidgetHost() {
 
   return (
     <WidgetShell appearanceOpacity={appearance.opacity}>
-      <div className="flex h-full flex-col justify-center px-[14px] py-[11px] text-white">
-        <div className="space-y-[8px]">
+      <div className="flex h-full flex-col justify-center px-[15px] py-[12px] text-white">
+        <div className="space-y-[7px]">
           {models.slice(0, 4).map((model, index) => {
             const color = MODEL_COLORS[index % MODEL_COLORS.length];
             const pct = Number(model?.percent || 0);
             return (
-              <div key={model.id || model.name} className="space-y-[5px]">
-                <div className="grid grid-cols-[minmax(0,1fr)_48px_30px] items-center gap-[6px] text-[11px] leading-[14px]">
+              <div key={model.id || model.name} className="space-y-[4px]">
+                <div className="grid grid-cols-[minmax(0,1fr)_47px_30px] items-center gap-[5px] text-[10.5px] leading-[13px]">
                   <div className="flex min-w-0 items-center gap-[6px] py-[1px]">
                   <span
                     className="h-[6px] w-[6px] rounded-full shrink-0"
                     style={{ background: color }}
                   />
-                  <span className="min-w-0 truncate font-semibold text-white/92 leading-[14px]">
+                  <span className="min-w-0 truncate font-semibold text-white/92 leading-[13px]">
                     {middleEllipsis(model.name, 20)}
                   </span>
                   </div>
                   <span className="shrink-0 font-semibold text-white/84">
                     {formatCompact(model.tokens)}
                   </span>
-                  <span className="w-[30px] shrink-0 text-right text-[10px] font-medium text-white/58">
+                  <span className="w-[30px] shrink-0 text-right text-[9.5px] font-medium text-white/58">
                     {pct}%
                   </span>
                 </div>
-                <div className="ml-[12px] h-[4px] rounded-full bg-white/18">
+                <div className="ml-[12px] h-[3px] rounded-full bg-white/18">
                   <div
-                    className="h-[4px] rounded-full"
+                    className="h-[3px] rounded-full"
                     style={{
                       width: `${Math.max(2, Math.min(100, pct))}%`,
                       background: color,
@@ -529,15 +536,15 @@ function LimitsWidgetHost() {
 
   return (
     <WidgetShell appearanceOpacity={appearance.opacity}>
-      <div className="flex h-full flex-col justify-center px-[16px] py-[13px] text-white">
+      <div className="flex h-full flex-col justify-center px-[16px] py-[14px] text-white">
         {rows.length > 0 ? (
-          <div className="space-y-[8px]">
+          <div className="space-y-[7px]">
             {rows.map((row, index) => {
               const pct = Math.round(Number(row.pct || 0));
               const fill = limitBarFill(Math.max(0, Math.min(1, pct / 100)));
               return (
-                <div key={`${row.label}-${index}`} className="space-y-[5px]">
-                  <div className="flex items-center gap-[6px] text-[11px] leading-[14px]">
+                <div key={`${row.label}-${index}`} className="space-y-[4px]">
+                  <div className="flex items-center gap-[6px] text-[10.5px] leading-[13px]">
                     <span
                       className="h-[6px] w-[6px] rounded-full shrink-0"
                       style={{ background: SOURCE_COLORS[row.source] || "#0A84FF" }}
@@ -545,16 +552,16 @@ function LimitsWidgetHost() {
                     <span className="min-w-0 flex-1 truncate font-semibold text-white/90">
                       {row.label}
                     </span>
-                    <span className="shrink-0 text-[10px] font-medium text-white/56">
+                    <span className="shrink-0 text-[9.5px] font-medium text-white/56">
                       {row.reset}
                     </span>
                     <span className="w-[30px] shrink-0 text-right font-semibold text-white/88">
                       {pct}%
                     </span>
                   </div>
-                  <div className="h-[4px] rounded-full bg-white/18">
+                  <div className="h-[3px] rounded-full bg-white/18">
                     <div
-                      className="h-[4px] rounded-full"
+                      className="h-[3px] rounded-full"
                       style={{
                         width: `${Math.max(2, pct)}%`,
                         background: fill,

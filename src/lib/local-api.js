@@ -177,7 +177,18 @@ function aggregateByDay(rows, timeZoneContext = null) {
     a.reasoning_output_tokens += row.reasoning_output_tokens || 0;
     a.conversation_count += row.conversation_count || 0;
   }
-  return Array.from(byDay.values()).sort((a, b) => a.day.localeCompare(b.day));
+  return Array.from(byDay.values()).map(addCacheHitRate).sort((a, b) => a.day.localeCompare(b.day));
+}
+
+function addCacheHitRate(row) {
+  const input = Number(row?.input_tokens || 0);
+  const cached = Number(row?.cached_input_tokens || 0);
+  const created = Number(row?.cache_creation_input_tokens || 0);
+  const denominator = input + cached + created;
+  return {
+    ...row,
+    cache_hit_rate: denominator > 0 ? (cached / denominator) * 100 : null,
+  };
 }
 
 function getRequestedUsageScope(url) {
@@ -310,7 +321,7 @@ function aggregateHourlyByDay(rows, dayKey, timeZoneContext) {
     bucket.reasoning_output_tokens += row.reasoning_output_tokens || 0;
     bucket.conversation_count += row.conversation_count || 0;
   }
-  return Array.from(byHour.values()).sort((a, b) => a.hour.localeCompare(b.hour));
+  return Array.from(byHour.values()).map(addCacheHitRate).sort((a, b) => a.hour.localeCompare(b.hour));
 }
 
 // ---------------------------------------------------------------------------
@@ -1134,7 +1145,7 @@ function createLocalApiHandler({ queuePath }) {
         a.reasoning_output_tokens += row.reasoning_output_tokens || 0;
         a.conversation_count += row.conversation_count || 0;
       }
-      json(res, { from, to, scope, excluded_sources: excludedSources, data: Array.from(byMonth.values()).sort((a, b) => a.month.localeCompare(b.month)) });
+      json(res, { from, to, scope, excluded_sources: excludedSources, data: Array.from(byMonth.values()).map(addCacheHitRate).sort((a, b) => a.month.localeCompare(b.month)) });
       return true;
     }
 

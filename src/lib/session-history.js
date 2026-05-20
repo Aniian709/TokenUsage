@@ -300,6 +300,7 @@ async function collectJsonlFilesRecursive(dirPath, files) {
 function aggregateEventsToRows(events) {
   const byBucket = new Map();
   const byEventId = new Map();
+  const seenConversationDays = new Set();
 
   for (const event of events) {
     const eventId = normalizeSnapshotEventId(event?.request_id, event);
@@ -335,6 +336,11 @@ function aggregateEventsToRows(events) {
     for (const field of TOKEN_FIELDS) {
       row[field] += toNonNegativeInt(event?.totals?.[field]);
     }
+    const conversationKey = eventConversationDayKey(event);
+    if (conversationKey && !seenConversationDays.has(conversationKey)) {
+      seenConversationDays.add(conversationKey);
+      row.conversation_count += 1;
+    }
   }
 
   return Array.from(byBucket.values()).sort((left, right) => {
@@ -342,6 +348,26 @@ function aggregateEventsToRows(events) {
     if (left.source !== right.source) return left.source.localeCompare(right.source);
     return left.model.localeCompare(right.model);
   });
+}
+
+function eventConversationDayKey(event) {
+  const hourStart = String(event?.hour_start || "");
+  if (!hourStart) return null;
+  const day = hourStart.slice(0, 10);
+  const source = event?.source || inferSourceFromFilePath(event?.file_path);
+  const requestId = String(event?.request_id || "");
+
+  if (source === "claude") {
+    const match = requestId.match(/^session:([^:]+):/u);
+    return match ? `${source}:${match[1]}:${day}` : null;
+  }
+
+  if (source === "codex") {
+    const match = requestId.match(/^codex_session:(.*):file_[a-f0-9]{12}:\d+$/u);
+    return match ? `${source}:${match[1]}:${day}` : null;
+  }
+
+  return null;
 }
 
 function extractTokenCount(obj) {

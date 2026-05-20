@@ -15,6 +15,11 @@ function buildDailySortColumns() {
       title: copy("daily.sort.cached.title"),
     },
     {
+      key: "cache_hit_rate",
+      label: copy("daily.sort.cache_hit_rate.label"),
+      title: copy("daily.sort.cache_hit_rate.title"),
+    },
+    {
       key: "reasoning_output_tokens",
       label: copy("daily.sort.reasoning.label"),
       title: copy("daily.sort.reasoning.title"),

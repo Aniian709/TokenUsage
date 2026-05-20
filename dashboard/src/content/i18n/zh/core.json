@@ -144,6 +144,8 @@
   "daily.sort.output.title": "按输出排序",
   "daily.sort.cached.label": "缓存",
   "daily.sort.cached.title": "按缓存输入排序",
+  "daily.sort.cache_hit_rate.label": "命中率",
+  "daily.sort.cache_hit_rate.title": "按缓存命中率排序",
   "daily.sort.reasoning.label": "推理",
   "daily.sort.reasoning.title": "按推理输出排序",
   "daily.sort.conversations.label": "对话数",

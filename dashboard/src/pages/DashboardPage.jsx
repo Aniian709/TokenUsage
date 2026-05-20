@@ -667,6 +667,15 @@ export function DashboardPage({
     if (key === "total_tokens") {
       return toDisplayNumber(getBillableTotal(row));
     }
+    if (key === "cache_hit_rate") {
+      const value = Number(row?.cache_hit_rate);
+      if (Number.isFinite(value)) return `${value.toFixed(1)}%`;
+      const input = Number(row?.input_tokens || 0);
+      const cached = Number(row?.cached_input_tokens || 0);
+      const created = Number(row?.cache_creation_input_tokens || 0);
+      const denominator = input + cached + created;
+      return denominator > 0 ? `${((cached / denominator) * 100).toFixed(1)}%` : "—";
+    }
     return toDisplayNumber(row?.[key]);
   }
 

@@ -343,6 +343,8 @@ daily.sort.output.label,dashboard,DashboardPage,DailyTable,sort_label,"Output",,
 daily.sort.output.title,dashboard,DashboardPage,DailyTable,sort_title,"Sort by Output",,active
 daily.sort.cached.label,dashboard,DashboardPage,DailyTable,sort_label,"Cached",,active
 daily.sort.cached.title,dashboard,DashboardPage,DailyTable,sort_title,"Sort by Cached input",,active
+daily.sort.cache_hit_rate.label,dashboard,DashboardPage,DailyTable,sort_label,"Hit Rate",,active
+daily.sort.cache_hit_rate.title,dashboard,DashboardPage,DailyTable,sort_title,"Sort by Cache hit rate",,active
 daily.sort.reasoning.label,dashboard,DashboardPage,DailyTable,sort_label,"Reasoning",,active
 daily.sort.reasoning.title,dashboard,DashboardPage,DailyTable,sort_title,"Sort by Reasoning output",,active
 daily.sort.conversations.label,dashboard,DashboardPage,DailyTable,sort_label,"Convs",,active

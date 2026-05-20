@@ -173,6 +173,9 @@ export function DataDetails({
                       {renderDetailCell(row, "cached_input_tokens")}
                     </td>
                     <td className="px-4 py-2 oai-text-body-sm text-oai-gray-600 dark:text-oai-gray-300 tabular-nums">
+                      {renderDetailCell(row, "cache_hit_rate")}
+                    </td>
+                    <td className="px-4 py-2 oai-text-body-sm text-oai-gray-600 dark:text-oai-gray-300 tabular-nums">
                       {renderDetailCell(row, "reasoning_output_tokens")}
                     </td>
                     <td className="px-4 py-2 oai-text-body-sm text-oai-gray-600 dark:text-oai-gray-300 tabular-nums">
