@@ -267,7 +267,7 @@
   "menubar.metric.claude_7d": "Claude 7 天限额",
   "menubar.metric.codex_5h": "Codex 5 小时限额",
   "menubar.metric.codex_7d": "Codex 7 天限额",
-  "nav.ip_check": "Claude IP 检查",
+  "nav.ip_check": "IP检测",
   "skills.page.title": "Skills",
   "skills.tab.my": "我的",
   "skills.tab.browse": "发现",
