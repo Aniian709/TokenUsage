@@ -29,7 +29,7 @@
     "start": "node bin/tracker.js serve",
     "dashboard:build": "npm --prefix dashboard run build",
     "dashboard:dev": "npm --prefix dashboard run dev",
-    "widgets:install": "node scripts/install-widgets-runtime.js"
+    "widgets:install": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/install-widgets-runtime.ps1"
   },
   "repository": {
     "type": "git",

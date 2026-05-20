@@ -20,7 +20,8 @@ if not defined NODE_EXE (
   exit /b 1
 )
 
-"%NODE_EXE%" "%REPO_DIR%scripts\install-widgets-runtime.js"
+set "PS1_FILE=%REPO_DIR%scripts\install-widgets-runtime.ps1"
+powershell -NoProfile -ExecutionPolicy Bypass -File "%PS1_FILE%"
 set "EXIT_CODE=%ERRORLEVEL%"
 
 if "%EXIT_CODE%"=="0" (
