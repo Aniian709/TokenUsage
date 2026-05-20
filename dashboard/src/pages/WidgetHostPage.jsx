@@ -374,7 +374,7 @@ function HeatmapWidgetHost() {
     5000,
     useMemo(
       () => async (active) => {
-        const res = await getUsageHeatmap({ weeks: 26, weekStartsOn: "sun" });
+        const res = await getUsageHeatmap({ weeks: 4, weekStartsOn: "sun" });
         if (!active) return;
         const nextCells = Array.isArray(res?.weeks) ? res.weeks.flat() : [];
         const totalTokens = nextCells
@@ -388,9 +388,9 @@ function HeatmapWidgetHost() {
 
   const weeks = useMemo(() => {
     const emptyCell = { empty: true, level: 0 };
-    const normalized = cells.slice(-182);
+    const normalized = cells.slice(-28);
     const padded = [
-      ...Array.from({ length: Math.max(0, 182 - normalized.length) }, () => emptyCell),
+      ...Array.from({ length: Math.max(0, 28 - normalized.length) }, () => emptyCell),
       ...normalized,
     ];
     const grouped = [];
