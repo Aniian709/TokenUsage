@@ -1,7 +1,5 @@
 import React, { useMemo } from "react";
 import { useLocation } from "react-router-dom";
-import { Analytics } from "@vercel/analytics/react";
-import { SpeedInsights } from "@vercel/speed-insights/react";
 import { ErrorBoundary } from "./components/ErrorBoundary.jsx";
 import { LoginModalProvider } from "./contexts/LoginModalContext.jsx";
 import { useLocale } from "./hooks/useLocale.js";
@@ -76,8 +74,6 @@ export default function App() {
       <ThemeProvider>
         <LoginModalProvider>
           {content}
-          <Analytics />
-          <SpeedInsights />
         </LoginModalProvider>
       </ThemeProvider>
     </ErrorBoundary>

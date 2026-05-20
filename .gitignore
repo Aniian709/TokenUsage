@@ -92,6 +92,10 @@ build/
 *.tsbuildinfo
 token.pid
 
+# Publish repository intentionally includes the prebuilt dashboard.
+!dashboard/dist/
+!dashboard/dist/**
+
 # InsForge & AI agent skills
 .insforge
 .agents
