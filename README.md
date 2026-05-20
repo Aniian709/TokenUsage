@@ -10,118 +10,158 @@
   <a href="./README.md">English</a> · <a href="./README.zh-CN.md">中文</a>
 </p>
 
-`TokenUsage` is a Windows-first local dashboard for tracking token usage from `Codex` and `Claude Code`.
+`TokenUsage` is a local Windows dashboard for monitoring AI coding token usage. It reads local session history from tools such as `Codex` and `Claude Code`, stores a persistent local snapshot, and displays usage totals, cost estimates, model breakdowns, trend charts, heatmaps, usage limits, and desktop widgets.
 
-It keeps the visual style of the original TokenUsage dashboard, but this repository is focused on local use:
-- no login flow
-- no leaderboard
-- persisted local history
-- Windows desktop floating widgets
-- local usage limits, model breakdown, heatmap, and trend views
+Repository: [Aniian709/TokenUsage](https://github.com/Aniian709/TokenUsage)
 
-## Version Notes
+Issues: [GitHub Issues](https://github.com/Aniian709/TokenUsage/issues)
 
-- `v0.6.2` - Windows-first local dashboard, persisted history, widget overlays, and no login / no leaderboard.
+## Contents
 
-Repository:
-- [Aniian709/TokenUsage](https://github.com/Aniian709/TokenUsage)
+- [Features](#features)
+- [System Requirements](#system-requirements)
+- [Data and Privacy](#data-and-privacy)
+- [Installation](#installation)
+- [Startup Methods](#startup-methods)
+- [Usage Guide](#usage-guide)
+- [Configuration](#configuration)
+- [File and Data Locations](#file-and-data-locations)
+- [Common Commands](#common-commands)
+- [Troubleshooting](#troubleshooting)
+- [Development](#development)
+- [License](#license)
 
-Issues:
-- [GitHub Issues](https://github.com/Aniian709/TokenUsage/issues)
+## Features
 
-## What This Project Does
+- Local token usage dashboard for Windows.
+- `1d`, `7d`, `30d`, and all-time usage ranges.
+- Token totals and estimated cost.
+- Model usage ranking and percentage breakdown.
+- Daily activity heatmap and trend chart.
+- Local persistent history snapshot under `~/.tokenusage`.
+- Windows desktop overlay widgets controlled from the dashboard.
+- Optional usage limit display for supported providers when local credentials are available.
+- Prebuilt frontend included in `dashboard/dist`, so normal users do not need to build the frontend.
 
-`TokenUsage` reads local session history from tools such as:
-- `Codex`
-- `Claude Code`
+## System Requirements
 
-It then renders:
-- total token usage
-- daily, 7-day, 30-day, and all-time views
-- model usage ranking
-- activity heatmap
-- usage trend chart
-- usage limits
-- Windows desktop widgets
+### Required
 
-The project is local-first. Your dashboard data is read from local files on your machine.
+- Windows 10 or Windows 11.
+- Node.js 20 or newer.
+- npm, included with Node.js.
 
-## Supported Platform
+Check your versions:
 
-- Windows 10 or Windows 11
-- Node.js 20 or newer
+```powershell
+node -v
+npm -v
+```
 
-## Folder Structure
+### Recommended
 
-Important folders:
+- Latest stable Node.js 20 LTS or newer.
+- A terminal that can run PowerShell or Command Prompt.
+- Existing local history from `Codex` or `Claude Code` if you want usage data to appear immediately.
 
-- `bin/`
-  CLI entry script
-- `src/`
-  local backend, session parsing, usage aggregation, widget host logic
-- `dashboard/src/`
-  frontend source code
-- `dashboard/dist/`
-  prebuilt frontend files included in this repository
+## Data and Privacy
 
-## Install
+TokenUsage is local-first.
 
-### 1. Clone the repository
+- Usage data is read from local files on your machine.
+- The local snapshot is stored under `C:\Users\<you>\.tokenusage`.
+- The dashboard runs on `http://127.0.0.1:7680` by default.
+- If a source session file is deleted after TokenUsage has scanned it, the recorded history remains in the local snapshot.
+- If a source session file was deleted before TokenUsage ever scanned it, TokenUsage cannot recover that missing history from the local filesystem.
+
+Typical local source locations:
+
+```text
+C:\Users\<you>\.codex\sessions\...
+C:\Users\<you>\.codex\archived_sessions\...
+C:\Users\<you>\.claude\projects\...
+```
+
+## Installation
+
+### 1. Install Node.js
+
+Install Node.js 20 or newer from:
+
+[https://nodejs.org](https://nodejs.org)
+
+After installation, reopen your terminal and verify:
+
+```powershell
+node -v
+npm -v
+```
+
+### 2. Download TokenUsage
+
+Use Git:
 
 ```powershell
 git clone https://github.com/Aniian709/TokenUsage.git
 cd TokenUsage
 ```
 
-### 2. Install root dependencies
+Or download the repository ZIP from GitHub, extract it, then open a terminal in the extracted `TokenUsage` folder.
+
+### 3. Install Dependencies
+
+Run this in the project root:
 
 ```powershell
 npm install
 ```
 
-This installs the local backend and desktop widget host dependencies.
+This installs the local backend and desktop widget dependencies.
 
-Optional desktop shortcuts:
+### 4. Optional: Create Desktop Shortcuts
 
-```text
-Double-click CreateDesktopShortcuts.cmd
-```
-
-This creates two Windows desktop shortcuts:
-
-- `Token` starts TokenUsage.
-- `TokenStop` stops the local service and widget host.
-
-If you move the project folder later, run `CreateDesktopShortcuts.cmd` again so the shortcuts point to the new path.
-
-### 3. Frontend dependencies
-
-The repository already includes a built `dashboard/dist`, so for normal use you do not need to build the frontend again.
-
-Only run this if you want to modify frontend code yourself:
-
-```powershell
-cd dashboard
-npm install
-npm run build
-cd ..
-```
-
-## Start the App
-
-Recommended for normal users:
+Double-click:
 
 ```text
-Double-click TokenUsage.cmd
+CreateDesktopShortcuts.cmd
 ```
 
-It starts the local dashboard in a normal Windows terminal window and works regardless of where you place the project folder.
+This creates two shortcuts on your Windows desktop:
 
-If you created desktop shortcuts, you can use `Token` to start and `TokenStop` to stop.
+- `Token`: starts TokenUsage.
+- `TokenStop`: stops the local service and desktop widget host.
 
-Manual alternative:
+If you move the project folder later, run `CreateDesktopShortcuts.cmd` again so the shortcuts point to the new location.
 
-Run:
+## Startup Methods
+
+### Method 1: Start from Desktop Shortcut
+
+If you created shortcuts:
+
+```text
+Double-click Token
+```
+
+To stop:
+
+```text
+Double-click TokenStop
+```
+
+### Method 2: Start from Project Folder
+
+Double-click:
+
+```text
+TokenUsage.cmd
+```
+
+This starts TokenUsage in a normal Windows terminal window.
+
+### Method 3: Start from Terminal
+
+Run this in the project root:
 
 ```powershell
 node .\bin\tracker.js serve
@@ -133,64 +173,141 @@ Then open:
 http://127.0.0.1:7680
 ```
 
-If you created your own launcher script such as `token`, you can also use that local alias instead.
+### Use a Different Port
 
-## How to Use
+```powershell
+node .\bin\tracker.js serve --port 7681
+```
+
+Then open:
+
+```text
+http://127.0.0.1:7681
+```
+
+## Usage Guide
 
 ### Dashboard
 
-After opening the local dashboard, you can view:
-- `1d` usage
-- `7d` usage
-- `30d` usage
-- all-time usage
-- model breakdown
-- daily detail table
-- heatmap
-- trend chart
+Open the dashboard in your browser:
+
+```text
+http://127.0.0.1:7680
+```
+
+The main dashboard shows:
+
+- Token usage summary.
+- Estimated cost.
+- `1d`, `7d`, `30d`, and all-time range switching.
+- Usage trend chart.
+- Activity heatmap.
+- Top model ranking.
+- Daily detail table.
 
 ### Desktop Widgets
 
 Open the `Widgets` page in the dashboard.
 
-From there you can enable:
-- Summary widget
-- Heatmap widget
-- Top Models widget
-- Usage Limits widget
-- floating menu bar style widget
+Available widget types include:
 
-The widgets are Windows desktop overlays controlled from the web dashboard.
+- Summary widget.
+- Heatmap widget.
+- Top Models widget.
+- Usage Limits widget.
+- Menu bar style floating widget.
+
+The widgets are controlled from the web dashboard and displayed as Windows desktop overlays.
 
 ### Usage Limits
 
-If your local environment has available provider/account data, the dashboard can display usage limits.
+The usage limits panel depends on local provider/account data and network access.
 
-For `Codex`, limits may depend on local authentication and whether your local Node service can reach the required API through your network/proxy environment.
+Codex limits may require:
 
-## Data Sources
+- Existing local Codex authentication.
+- Working network access from Node.js.
+- Proxy or DNS settings that allow the required API requests.
 
-This project reads local history from your machine and keeps local snapshots to preserve historical usage even if some original chat/session files are deleted later.
+If credentials or network access are unavailable, usage statistics can still work while the limits panel may show an error.
 
-Examples of local sources include:
-- `~/.codex/...`
-- `~/.claude/...`
-- local tracker cache under `~/.tokenusage/...`
+### Historical Snapshot
 
-## Rebuild the Frontend
+TokenUsage scans local session files and stores parsed events in:
 
-If you edit frontend files in `dashboard/src`, rebuild with:
-
-```powershell
-cd dashboard
-npm run build
-cd ..
+```text
+C:\Users\<you>\.tokenusage\cache\session-history-cache.json
 ```
 
-This updates:
-- `dashboard/dist/index.html`
-- `dashboard/dist/share.html`
-- `dashboard/dist/assets/...`
+This snapshot is append/merge based. It is designed to preserve already-scanned history even if the original session files are later deleted.
+
+## Configuration
+
+### Required Configuration
+
+For basic local usage statistics, there is usually no manual configuration.
+
+TokenUsage automatically creates:
+
+```text
+C:\Users\<you>\.tokenusage\
+C:\Users\<you>\.tokenusage\cache\
+C:\Users\<you>\.tokenusage\tracker\
+```
+
+### Source Data Requirements
+
+TokenUsage can only show usage that exists in local source files or has already been saved into the local snapshot.
+
+Expected source examples:
+
+```text
+C:\Users\<you>\.codex\sessions\...
+C:\Users\<you>\.codex\archived_sessions\...
+C:\Users\<you>\.claude\projects\...
+```
+
+### Optional Environment Variables
+
+Normal users usually do not need environment variables.
+
+Advanced users may use standard Windows proxy variables if their network requires a proxy:
+
+```powershell
+setx HTTP_PROXY http://127.0.0.1:7890
+setx HTTPS_PROXY http://127.0.0.1:7890
+```
+
+Restart the terminal after changing environment variables.
+
+## File and Data Locations
+
+### Project Files
+
+```text
+TokenUsage\
+  bin\                         CLI entrypoint
+  src\                         Local backend, parsers, pricing, widgets
+  dashboard\src\               Frontend source code
+  dashboard\dist\              Prebuilt frontend used at runtime
+  CreateDesktopShortcuts.cmd   Creates Token and TokenStop desktop shortcuts
+  TokenUsage.cmd               Starts TokenUsage from the project folder
+  TokenUsageStop.cmd           Stops TokenUsage service and widget host
+  package.json                 Node package metadata and scripts
+  README.md                    English documentation
+  README.zh-CN.md              Chinese documentation
+```
+
+### Runtime Data
+
+```text
+C:\Users\<you>\.tokenusage\
+  cache\session-history-cache.json   Persistent local usage snapshot
+  tracker\queue.jsonl                Local tracker queue/runtime data
+  tracker\widget-host.pid            Desktop widget host process id
+```
+
+Runtime data is generated automatically. Do not commit it to Git.
 
 ## Common Commands
 
@@ -198,6 +315,18 @@ Start local dashboard:
 
 ```powershell
 node .\bin\tracker.js serve
+```
+
+Start without opening the browser automatically:
+
+```powershell
+node .\bin\tracker.js serve --no-open
+```
+
+Use another port:
+
+```powershell
+node .\bin\tracker.js serve --port 7681
 ```
 
 Sync local data manually:
@@ -212,47 +341,112 @@ Check status:
 node .\bin\tracker.js status
 ```
 
-## Troubleshooting
+Run diagnostics:
 
-### Port 7680 is already in use
-
-If you see a port conflict:
-
-```text
-Port 7680 is still in use after cleanup
+```powershell
+node .\bin\tracker.js diagnostics
 ```
 
-Either close the old process or run on another port:
+## Troubleshooting
+
+### `npm install` Is Not Recognized
+
+Node.js or npm is not installed, or the terminal was opened before Node.js was added to `PATH`.
+
+Fix:
+
+1. Install Node.js 20 or newer.
+2. Close and reopen the terminal.
+3. Run `node -v` and `npm -v` again.
+
+### Dashboard Does Not Open
+
+Try opening the URL manually:
+
+```text
+http://127.0.0.1:7680
+```
+
+If it still fails, start from terminal so you can read the error:
+
+```powershell
+node .\bin\tracker.js serve
+```
+
+### Port 7680 Is Already in Use
+
+Start on another port:
 
 ```powershell
 node .\bin\tracker.js serve --port 7681
 ```
 
-### Codex usage limits show `fetch failed`
+Or run `TokenStop` if you created the desktop shortcut.
 
-This usually means one of these:
-- local Codex authentication is missing or expired
-- the local Node service cannot reach the required endpoint
-- your Windows proxy or network tool is blocking that request
+### No Usage Data Appears
 
-Check:
-- whether your Codex local auth file exists
-- whether your network/proxy settings allow the request
-- whether restarting the local dashboard service fixes it
+Check these points:
 
-### No historical data appears
+- You have used `Codex` or `Claude Code` on this Windows account.
+- Local history files exist under `.codex` or `.claude`.
+- You started TokenUsage after those history files were created.
+- The source files were not deleted before TokenUsage scanned them.
 
-Check whether your local `Codex` or `Claude Code` history exists on disk. If you deleted old source session files before TokenUsage saved a local snapshot, those older records may not be recoverable.
+### Usage Numbers Differ from an API Gateway
 
-## For Contributors
+TokenUsage reads local session history and local snapshots. A gateway may count requests at the API proxy layer. These two methods can differ because they observe different sources.
 
-If you want to keep using this repository as a runnable project for other users:
+Common causes:
 
-1. update source code in `src/` and `dashboard/src/`
-2. rebuild `dashboard/dist`
-3. commit both source files and built assets together
+- Some conversations were deleted before TokenUsage scanned them.
+- The gateway counts requests that are not present in local session files.
+- The local tool records cached tokens, reasoning tokens, or model names differently.
+- Pricing tables may differ between tools.
 
-That ensures users can clone the repository and use it directly without having to fix missing frontend output.
+### `Codex` Usage Limits Show `fetch failed`
+
+Common causes:
+
+- Local Codex authentication is missing or expired.
+- Node.js cannot reach the required API endpoint.
+- Proxy, DNS, or firewall settings block the request.
+
+Basic usage statistics can still work even if usage limits fail.
+
+### Desktop Shortcut Opens the Wrong Folder
+
+Run this again from the current project folder:
+
+```text
+CreateDesktopShortcuts.cmd
+```
+
+Windows shortcuts store absolute paths, so they must be recreated after moving the project folder.
+
+## Development
+
+### Frontend Development
+
+The repository includes prebuilt frontend files in `dashboard/dist`.
+
+Only rebuild the frontend if you edit files under `dashboard/src`:
+
+```powershell
+cd dashboard
+npm install
+npm run build
+cd ..
+```
+
+### Release Checklist
+
+Before publishing updates:
+
+1. Update source files under `src` and `dashboard/src`.
+2. Rebuild `dashboard/dist` if frontend code changed.
+3. Run a basic local startup check.
+4. Run `npm pack --dry-run` and confirm required files are included.
+5. Commit source files and built assets together.
 
 ## License
 
