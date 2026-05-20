@@ -72,9 +72,12 @@ function buildHourlyTrendPoints(hourlyRows) {
     hourly[hour] += usageTokenValue(row);
   }
 
+  const firstActiveHour = hourly.findIndex((value) => value > 0);
+  if (firstActiveHour < 0) return [0, 0];
+
   const cumulative = [0];
   let running = 0;
-  for (const value of hourly) {
+  for (const value of hourly.slice(firstActiveHour)) {
     running += value;
     cumulative.push(running);
   }
@@ -371,9 +374,9 @@ function HeatmapWidgetHost() {
     5000,
     useMemo(
       () => async (active) => {
-        const res = await getUsageHeatmap({ weeks: 5, weekStartsOn: "sun" });
+        const res = await getUsageHeatmap({ weeks: 26, weekStartsOn: "sun" });
         if (!active) return;
-        const nextCells = (Array.isArray(res?.weeks) ? res.weeks.flat() : []).slice(-30);
+        const nextCells = Array.isArray(res?.weeks) ? res.weeks.flat() : [];
         const totalTokens = nextCells
           .reduce((sum, cell) => sum + Number(cell?.billable_total_tokens ?? cell?.total_tokens ?? 0), 0);
         setCells(nextCells);
@@ -383,32 +386,42 @@ function HeatmapWidgetHost() {
     ),
   );
 
-  const visibleCells = useMemo(() => {
-    const visible = cells.slice(-30);
+  const weeks = useMemo(() => {
     const emptyCell = { empty: true, level: 0 };
-    return [...Array.from({ length: Math.max(0, 30 - visible.length) }, () => emptyCell), ...visible];
+    const normalized = cells.slice(-182);
+    const padded = [
+      ...Array.from({ length: Math.max(0, 182 - normalized.length) }, () => emptyCell),
+      ...normalized,
+    ];
+    const grouped = [];
+    for (let index = 0; index < padded.length; index += 7) {
+      grouped.push(padded.slice(index, index + 7));
+    }
+    return grouped;
   }, [cells]);
 
   return (
     <WidgetShell appearanceOpacity={appearance.opacity}>
-      <div className="flex h-full flex-col justify-between px-[17px] pb-[13px] pt-[13px] text-white">
-        <div className="flex justify-center pt-[4px]">
-          <div className="grid grid-cols-10 grid-rows-3 gap-[3px]">
-            {visibleCells.map((cell, cellIndex) => (
-              <div
-                key={cell?.day || `empty-${cellIndex}`}
-                className="h-[15px] w-[15px] rounded-[3px] ring-1 ring-white/[0.04]"
-                style={{ background: heatmapFillForLevel(cell?.level) }}
-                title={cell?.day}
-              />
-            ))}
+      <div className="flex h-full flex-col justify-between px-[19px] pb-[15px] pt-[13px] text-white">
+        <div className="flex justify-center">
+          <div className="grid grid-flow-col grid-rows-7 gap-[1.5px]" style={{ gridAutoColumns: "7.5px" }}>
+            {weeks.map((week, weekIndex) =>
+              week.map((cell, dayIndex) => (
+                <div
+                  key={cell?.day || `empty-${weekIndex}-${dayIndex}`}
+                  className="h-[7.5px] w-[7.5px] rounded-[1.5px] ring-1 ring-white/[0.03]"
+                  style={{ background: heatmapFillForLevel(cell?.level) }}
+                  title={cell?.day}
+                />
+              )),
+            )}
           </div>
         </div>
         <div className="whitespace-nowrap text-[8px] leading-none text-white/62">
           <span className="mr-1 text-[10px] font-bold text-white">
             {formatCompact(meta.totalTokens)}
           </span>
-          tokens · {meta.activeDays} active days · 30 days
+          tokens · {meta.activeDays} active days
         </div>
       </div>
     </WidgetShell>
