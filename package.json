@@ -13,6 +13,9 @@
     "bin/",
     "src/",
     "dashboard/dist/",
+    "CreateDesktopShortcuts.cmd",
+    "TokenUsage.cmd",
+    "TokenUsageStop.cmd",
     "LICENSE",
     "README.md"
   ],

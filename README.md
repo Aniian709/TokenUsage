@@ -81,6 +81,19 @@ npm install
 
 This installs the local backend and desktop widget host dependencies.
 
+Optional desktop shortcuts:
+
+```text
+Double-click CreateDesktopShortcuts.cmd
+```
+
+This creates two Windows desktop shortcuts:
+
+- `Token` starts TokenUsage.
+- `TokenStop` stops the local service and widget host.
+
+If you move the project folder later, run `CreateDesktopShortcuts.cmd` again so the shortcuts point to the new path.
+
 ### 3. Frontend dependencies
 
 The repository already includes a built `dashboard/dist`, so for normal use you do not need to build the frontend again.
@@ -103,6 +116,8 @@ Double-click TokenUsage.cmd
 ```
 
 It starts the local dashboard in a normal Windows terminal window and works regardless of where you place the project folder.
+
+If you created desktop shortcuts, you can use `Token` to start and `TokenStop` to stop.
 
 Manual alternative:
 

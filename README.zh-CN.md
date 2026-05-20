@@ -78,6 +78,19 @@ npm install
 
 这一步会安装本地后端与桌面小组件宿主所需依赖。
 
+可选：创建桌面快捷方式：
+
+```text
+双击 CreateDesktopShortcuts.cmd
+```
+
+它会在 Windows 桌面生成两个快捷方式：
+
+- `Token` 用来启动 TokenUsage。
+- `TokenStop` 用来停止本地服务和桌面小组件宿主。
+
+如果以后移动了项目文件夹，重新运行一次 `CreateDesktopShortcuts.cmd`，让快捷方式指向新的路径。
+
 ### 3. 前端依赖
 
 仓库里已经包含可直接运行的 `dashboard/dist`，所以普通使用者通常不需要再次构建前端。
@@ -100,6 +113,8 @@ cd ..
 ```
 
 它会用正常的 Windows 终端窗口启动本地仪表盘，而且不依赖你把项目放在哪个文件夹。
+
+如果已经创建了桌面快捷方式，也可以用桌面的 `Token` 启动，用 `TokenStop` 停止。
 
 手动方式也可以：
 
