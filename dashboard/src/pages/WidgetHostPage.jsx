@@ -383,24 +383,21 @@ function HeatmapWidgetHost() {
     ),
   );
 
-  const paddedCells = useMemo(() => {
+  const visibleCells = useMemo(() => {
     const visible = cells.slice(-30);
     const emptyCell = { empty: true, level: 0 };
-    return [...Array.from({ length: Math.max(0, 35 - visible.length) }, () => emptyCell), ...visible];
+    return [...Array.from({ length: Math.max(0, 30 - visible.length) }, () => emptyCell), ...visible];
   }, [cells]);
 
   return (
     <WidgetShell appearanceOpacity={appearance.opacity}>
       <div className="flex h-full flex-col justify-between px-[17px] pb-[13px] pt-[13px] text-white">
-        <div className="flex justify-center">
-          <div
-            className="grid grid-flow-col grid-cols-5 grid-rows-7 gap-[2.5px]"
-            style={{ gridAutoFlow: "column" }}
-          >
-            {paddedCells.map((cell, cellIndex) => (
+        <div className="flex justify-center pt-[4px]">
+          <div className="grid grid-cols-10 grid-rows-3 gap-[3px]">
+            {visibleCells.map((cell, cellIndex) => (
               <div
                 key={cell?.day || `empty-${cellIndex}`}
-                className="h-[10px] w-[10px] rounded-[2px] ring-1 ring-white/[0.035]"
+                className="h-[15px] w-[15px] rounded-[3px] ring-1 ring-white/[0.04]"
                 style={{ background: heatmapFillForLevel(cell?.level) }}
                 title={cell?.day}
               />
@@ -446,8 +443,8 @@ function TopModelsWidgetHost() {
             const color = MODEL_COLORS[index % MODEL_COLORS.length];
             const pct = Number(model?.percent || 0);
             return (
-              <div key={model.id || model.name} className="space-y-[4px]">
-                <div className="grid grid-cols-[minmax(0,1fr)_47px_30px] items-center gap-[5px] text-[10.5px] leading-[13px]">
+              <div key={model.id || model.name} className="relative isolate space-y-[4px]">
+                <div className="relative z-20 grid grid-cols-[minmax(0,1fr)_47px_30px] items-center gap-[5px] text-[10.5px] leading-[13px]">
                   <div className="flex min-w-0 items-center gap-[6px] py-[1px]">
                   <span
                     className="h-[6px] w-[6px] rounded-full shrink-0"
@@ -464,7 +461,7 @@ function TopModelsWidgetHost() {
                     {pct}%
                   </span>
                 </div>
-                <div className="ml-[12px] h-[3px] rounded-full bg-white/18">
+                <div className="relative z-0 ml-[12px] h-[3px] rounded-full bg-white/18">
                   <div
                     className="h-[3px] rounded-full"
                     style={{
@@ -543,8 +540,8 @@ function LimitsWidgetHost() {
               const pct = Math.round(Number(row.pct || 0));
               const fill = limitBarFill(Math.max(0, Math.min(1, pct / 100)));
               return (
-                <div key={`${row.label}-${index}`} className="space-y-[4px]">
-                  <div className="flex items-center gap-[6px] text-[10.5px] leading-[13px]">
+                <div key={`${row.label}-${index}`} className="relative isolate space-y-[4px]">
+                  <div className="relative z-20 flex items-center gap-[6px] text-[10.5px] leading-[13px]">
                     <span
                       className="h-[6px] w-[6px] rounded-full shrink-0"
                       style={{ background: SOURCE_COLORS[row.source] || "#0A84FF" }}
@@ -559,7 +556,7 @@ function LimitsWidgetHost() {
                       {pct}%
                     </span>
                   </div>
-                  <div className="h-[3px] rounded-full bg-white/18">
+                  <div className="relative z-0 h-[3px] rounded-full bg-white/18">
                     <div
                       className="h-[3px] rounded-full"
                       style={{

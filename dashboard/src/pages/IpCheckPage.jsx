@@ -1,16 +1,9 @@
 import React, { useState } from "react";
 
-const CLAUDE_IP_CHECK_URL = "https://ip.net.coffee/claude/";
+const IP_CHECK_URL = "/api/ip-check/claude";
 
 export default function IpCheckPage() {
   const [loaded, setLoaded] = useState(false);
-  const [timedOut, setTimedOut] = useState(false);
-
-  React.useEffect(() => {
-    if (loaded) return undefined;
-    const timer = window.setTimeout(() => setTimedOut(true), 5000);
-    return () => window.clearTimeout(timer);
-  }, [loaded]);
 
   return (
     <div className="h-full relative overflow-hidden dark:bg-[#050505]">
@@ -22,24 +15,14 @@ export default function IpCheckPage() {
               正在加载 IP 检测
             </div>
             <div className="mt-2 text-xs leading-5 text-oai-gray-500 dark:text-oai-gray-400">
-              如果内嵌页面被浏览器或第三方站点策略拦截，可以直接在新标签页打开。
+              正在通过本地代理加载 ip.net.coffee，避免第三方页面拒绝 iframe 嵌入。
             </div>
-            {timedOut ? (
-              <a
-                href={CLAUDE_IP_CHECK_URL}
-                target="_blank"
-                rel="noreferrer"
-                className="mt-4 inline-flex rounded-lg bg-oai-black px-3 py-2 text-xs font-semibold text-white transition-opacity hover:opacity-85 dark:bg-white dark:text-oai-black"
-              >
-                新标签页打开 ip.net.coffee
-              </a>
-            ) : null}
           </div>
         </div>
       )}
       <iframe
-        src={CLAUDE_IP_CHECK_URL}
-        title="Cloud AI IP Check"
+        src={IP_CHECK_URL}
+        title="IP Check"
         className={`w-full h-full dark:invert dark:hue-rotate-180 transition-opacity duration-300 ${loaded ? "opacity-100" : "opacity-0"}`}
         style={{ border: "none" }}
         onLoad={() => setLoaded(true)}

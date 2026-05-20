@@ -563,6 +563,22 @@ function json(res, data, status) {
   res.end(JSON.stringify(data));
 }
 
+function html(res, body, status) {
+  res.writeHead(status || 200, {
+    "Content-Type": "text/html; charset=utf-8",
+    "Cache-Control": "no-store",
+  });
+  res.end(body);
+}
+
+function escapeHtml(value) {
+  return String(value || "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
 // ---------------------------------------------------------------------------
 // Main handler factory
 // ---------------------------------------------------------------------------
@@ -1108,6 +1124,30 @@ function createLocalApiHandler({ queuePath }) {
         created_at: new Date().toISOString(),
         pro: { active: true, sources: ["local"], expires_at: null, partial: false, as_of: new Date().toISOString() },
       });
+      return true;
+    }
+
+    // --- IP check proxy ---
+    if (p === "/api/ip-check/claude") {
+      try {
+        const upstream = await fetch("https://ip.net.coffee/claude/", {
+          headers: {
+            "User-Agent": "Mozilla/5.0 TokenUsage Local Dashboard",
+            Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+          },
+        });
+        const body = await upstream.text();
+        if (!upstream.ok) {
+          html(res, `<pre>ip.net.coffee returned HTTP ${upstream.status}</pre>`, upstream.status);
+          return true;
+        }
+        const withBase = body.includes("<head>")
+          ? body.replace("<head>", '<head><base href="https://ip.net.coffee/claude/">')
+          : `<base href="https://ip.net.coffee/claude/">${body}`;
+        html(res, withBase);
+      } catch (e) {
+        html(res, `<pre>Unable to load ip.net.coffee: ${escapeHtml(e?.message || String(e))}</pre>`, 502);
+      }
       return true;
     }
 
