@@ -12,6 +12,8 @@
 
 `TokenUsage` 是一个面向 Windows 本地环境的 AI Coding Token 用量监测面板。它会读取 `Codex`、`Claude Code` 等工具在本机生成的会话历史，保存本地历史快照，并展示 Token 总量、费用估算、模型占比、趋势图、热力图、使用限制和桌面小组件。
 
+本项目参考并改造自 [mm7894215/TokenTracker](https://github.com/mm7894215/TokenTracker)，并针对 Windows 本地使用场景重新整理和实现。
+
 仓库地址：[Aniian709/TokenUsage](https://github.com/Aniian709/TokenUsage)
 
 问题反馈：[GitHub Issues](https://github.com/Aniian709/TokenUsage/issues)

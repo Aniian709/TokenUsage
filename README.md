@@ -12,6 +12,8 @@
 
 `TokenUsage` is a local Windows dashboard for monitoring AI coding token usage. It reads local session history from tools such as `Codex` and `Claude Code`, stores a persistent local snapshot, and displays usage totals, cost estimates, model breakdowns, trend charts, heatmaps, usage limits, and desktop widgets.
 
+This project is a Windows-focused adaptation and reconstruction inspired by [mm7894215/TokenTracker](https://github.com/mm7894215/TokenTracker).
+
 Repository: [Aniian709/TokenUsage](https://github.com/Aniian709/TokenUsage)
 
 Issues: [GitHub Issues](https://github.com/Aniian709/TokenUsage/issues)
