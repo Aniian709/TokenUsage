@@ -35,12 +35,13 @@ export function ClawdAnimated({
   crop = true,
   cropPadding = 2,
   onMeasure,
+  respectReducedMotion = true,
 }) {
   const [svgHtml, setSvgHtml] = useState("");
   const containerRef = useRef(null);
   const reducedMotion = useReducedMotion();
 
-  const effectiveState = reducedMotion ? "static-base" : state;
+  const effectiveState = respectReducedMotion && reducedMotion ? "static-base" : state;
   const path = CLAWD_STATE_TO_PATH[effectiveState] || CLAWD_STATE_TO_PATH["static-base"];
 
   useEffect(() => {

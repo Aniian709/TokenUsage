@@ -329,6 +329,7 @@ function MenuBarPreview({ slotConfigs, showStats, animatedIcon, clawdState }) {
               state={clawdState}
               size={32}
               className="shrink-0"
+              respectReducedMotion={false}
             />
           ) : (
             <img
@@ -529,7 +530,7 @@ function ClawdPreviewGrid({ selectedState, onSelect, interactive = true }) {
             )}
           >
             <div className="flex h-24 w-full items-center justify-center overflow-hidden rounded-lg bg-white dark:bg-oai-gray-900">
-              <ClawdAnimated state={state} size={88} crop={false} />
+              <ClawdAnimated state={state} size={88} crop={false} respectReducedMotion={false} />
             </div>
             <span className="mt-3 text-sm font-semibold text-oai-black dark:text-white">
               {formatClawdStateLabel(state)}

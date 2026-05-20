@@ -2,12 +2,12 @@
 setlocal
 
 set "TOKENUSAGE_REPO_DIR=%~dp0"
-set "TOKENUSAGE_START=%TOKENUSAGE_REPO_DIR%TokenUsage.cmd"
+set "TOKENUSAGE_START=%TOKENUSAGE_REPO_DIR%TokenUsageSilent.vbs"
 set "TOKENUSAGE_STOP=%TOKENUSAGE_REPO_DIR%TokenUsageStop.cmd"
 set "TOKENUSAGE_ICON=%TOKENUSAGE_REPO_DIR%dashboard\dist\favicon.ico"
 
 if not exist "%TOKENUSAGE_START%" (
-  echo Missing TokenUsage.cmd in "%TOKENUSAGE_REPO_DIR%".
+  echo Missing TokenUsageSilent.vbs in "%TOKENUSAGE_REPO_DIR%".
   pause
   exit /b 1
 )

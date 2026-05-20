@@ -17,6 +17,7 @@
     "CreateDesktopShortcuts.cmd",
     "InstallWidgetsRuntime.cmd",
     "TokenUsage.cmd",
+    "TokenUsageSilent.vbs",
     "TokenUsageStop.cmd",
     "LICENSE",
     "README.md"

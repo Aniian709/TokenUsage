@@ -680,6 +680,7 @@ function MenuBarWidgetHost() {
                   cropPadding={clawdPresentation.cropPadding}
                   onMeasure={setClawdMeasure}
                   className="shrink-0"
+                  respectReducedMotion={false}
                 />
               </div>
             ) : (
