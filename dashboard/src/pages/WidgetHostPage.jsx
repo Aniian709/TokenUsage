@@ -55,6 +55,65 @@ function middleEllipsis(value, max = 20) {
   return `${text.slice(0, left)}…${text.slice(text.length - right)}`;
 }
 
+function usageTokenValue(row) {
+  const value = Number(row?.billable_total_tokens ?? row?.total_tokens ?? 0);
+  return Number.isFinite(value) ? value : 0;
+}
+
+function buildHourlyTrendPoints(hourlyRows) {
+  const now = new Date();
+  const currentHour = now.getHours();
+  const values = Array.from({ length: currentHour + 1 }, () => 0);
+
+  for (const row of Array.isArray(hourlyRows) ? hourlyRows : []) {
+    const match = String(row?.hour || "").match(/T(\d{2}):/);
+    const hour = match ? Number(match[1]) : NaN;
+    if (!Number.isInteger(hour) || hour < 0 || hour > currentHour) continue;
+    values[hour] += usageTokenValue(row);
+  }
+
+  return values.length >= 2 ? values : [0, values[0] || 0];
+}
+
+function buildSparklinePath(values, width = 264, height = 44, paddingY = 7) {
+  const data = Array.isArray(values) && values.length > 0 ? values.map((v) => Number(v) || 0) : [0, 0];
+  const max = Math.max(...data);
+  const min = Math.min(...data);
+  const span = max - min;
+  const usableHeight = height - paddingY * 2;
+  const points = data.map((value, index) => {
+    const x = data.length === 1 ? width / 2 : (index / (data.length - 1)) * width;
+    const ratio = span > 0 ? (value - min) / span : 0.5;
+    const y = height - paddingY - ratio * usableHeight;
+    return [x, y];
+  });
+
+  if (points.length === 1) {
+    const [, y] = points[0];
+    return `M0,${y.toFixed(2)} L${width},${y.toFixed(2)}`;
+  }
+
+  let path = `M${points[0][0].toFixed(2)},${points[0][1].toFixed(2)}`;
+  for (let index = 1; index < points.length; index += 1) {
+    const [prevX, prevY] = points[index - 1];
+    const [x, y] = points[index];
+    const midX = (prevX + x) / 2;
+    path += ` C${midX.toFixed(2)},${prevY.toFixed(2)} ${midX.toFixed(2)},${y.toFixed(2)} ${x.toFixed(2)},${y.toFixed(2)}`;
+  }
+  return path;
+}
+
+function heatmapFillForLevel(level) {
+  const normalized = Math.max(0, Math.min(4, Number(level || 0)));
+  if (normalized <= 0) return "#262626";
+  return [
+    "rgba(10, 132, 255, 0.28)",
+    "rgba(10, 132, 255, 0.50)",
+    "rgba(10, 132, 255, 0.75)",
+    "#0A84FF",
+  ][normalized - 1];
+}
+
 function limitBarFill(fraction) {
   if (fraction >= 0.8) return "#E64D4D";
   if (fraction >= 0.7) return "#D9A633";
@@ -253,8 +312,10 @@ function SummaryWidgetHost() {
   useWidgetHostChrome();
   const appearance = useOverlayAppearance();
   const summary = useSummaryData();
-  const sparklinePath =
-    "M0,36 C10,36 16,34 26,32 C38,29 46,28 56,24 C68,20 78,30 90,28 C102,26 110,18 122,18 C135,18 142,10 156,10 C170,10 178,22 190,21 C203,20 214,9 228,9 C240,9 250,15 264,13";
+  const sparklinePath = useMemo(
+    () => buildSparklinePath(buildHourlyTrendPoints(summary.hourly)),
+    [summary.hourly],
+  );
 
   return (
     <WidgetShell appearanceOpacity={appearance.opacity}>
@@ -297,56 +358,53 @@ function SummaryWidgetHost() {
 function HeatmapWidgetHost() {
   useWidgetHostChrome();
   const appearance = useOverlayAppearance();
-  const [weeks, setWeeks] = useState([]);
+  const [cells, setCells] = useState([]);
   const [meta, setMeta] = useState({ activeDays: 0, totalTokens: 0 });
 
   useWidgetClock(
     5000,
     useMemo(
       () => async (active) => {
-        const res = await getUsageHeatmap({ weeks: 1, weekStartsOn: "sun" });
+        const res = await getUsageHeatmap({ weeks: 5, weekStartsOn: "sun" });
         if (!active) return;
-        const nextWeeks = Array.isArray(res?.weeks) ? res.weeks : [];
-        const totalTokens = nextWeeks
-          .flat()
+        const nextCells = (Array.isArray(res?.weeks) ? res.weeks.flat() : []).slice(-30);
+        const totalTokens = nextCells
           .reduce((sum, cell) => sum + Number(cell?.billable_total_tokens ?? cell?.total_tokens ?? 0), 0);
-        setWeeks(nextWeeks);
-        setMeta({ activeDays: Number(res?.active_days || 0), totalTokens });
+        setCells(nextCells);
+        setMeta({ activeDays: nextCells.filter((cell) => usageTokenValue(cell) > 0).length, totalTokens });
       },
       [],
     ),
   );
 
+  const paddedCells = useMemo(() => {
+    const visible = cells.slice(-30);
+    return [...Array.from({ length: Math.max(0, 35 - visible.length) }, () => null), ...visible];
+  }, [cells]);
+
   return (
     <WidgetShell appearanceOpacity={appearance.opacity}>
-      <div className="flex h-full flex-col justify-between px-[17px] pb-[13px] pt-[14px] text-white">
-        <div className="grid grid-cols-7 grid-rows-7 gap-[3px]">
-          {Array.from({ length: 49 }).map((_, cellIndex) => {
-              const dayIndex = cellIndex % 7;
-              const rowIndex = Math.floor(cellIndex / 7);
-              const week = Array.isArray(weeks[weeks.length - 1]) ? weeks[weeks.length - 1] : [];
-              const cell = week[dayIndex] || null;
-              const level = Number(cell?.level || 0);
-              const seeded = ((dayIndex * 11 + rowIndex * 7) % 5) - 1;
-              const localLevel = Math.max(0, Math.min(4, level + (rowIndex === 6 - level ? 1 : 0) + (seeded > 2 ? 1 : 0) - (seeded < 0 ? 1 : 0)));
-              const bg =
-                localLevel <= 0
-                  ? "#5A5A5F"
-                  : ["#B7CBF7", "#8DB4F8", "#6797F6", "#4C7EF0", "#3B6BE6"][Math.min(4, localLevel - 1)];
-              return (
-                <div
-                  key={`day-${dayIndex}-${rowIndex}`}
-                  className="h-[10px] w-[10px] rounded-[2.5px]"
-                  style={{ background: bg }}
-                />
-              );
-            })}
+      <div className="flex h-full flex-col justify-between px-[17px] pb-[13px] pt-[13px] text-white">
+        <div className="flex justify-center">
+          <div
+            className="grid grid-flow-col grid-cols-5 grid-rows-7 gap-[3px]"
+            style={{ gridAutoFlow: "column" }}
+          >
+            {paddedCells.map((cell, cellIndex) => (
+              <div
+                key={cell?.day || `empty-${cellIndex}`}
+                className="h-[10px] w-[10px] rounded-[2px]"
+                style={{ background: cell ? heatmapFillForLevel(cell.level) : "transparent" }}
+                title={cell?.day}
+              />
+            ))}
+          </div>
         </div>
         <div className="whitespace-nowrap text-[8px] leading-none text-white/62">
           <span className="mr-1 text-[10px] font-bold text-white">
             {formatCompact(meta.totalTokens)}
           </span>
-          tokens · 7 days
+          tokens · {meta.activeDays} active days · 30 days
         </div>
       </div>
     </WidgetShell>
@@ -375,33 +433,33 @@ function TopModelsWidgetHost() {
 
   return (
     <WidgetShell appearanceOpacity={appearance.opacity}>
-      <div className="flex h-full flex-col justify-center px-[14px] py-[10px] text-white">
-        <div className="space-y-[7px]">
+      <div className="flex h-full flex-col justify-center px-[14px] py-[11px] text-white">
+        <div className="space-y-[8px]">
           {models.slice(0, 4).map((model, index) => {
             const color = MODEL_COLORS[index % MODEL_COLORS.length];
             const pct = Number(model?.percent || 0);
             return (
-              <div key={model.id || model.name} className="space-y-[4px]">
-                <div className="grid grid-cols-[minmax(0,1fr)_46px_30px] items-center gap-[6px] text-[10px] leading-[1.15]">
-                  <div className="flex min-w-0 items-center gap-[6px] py-[2px]">
+              <div key={model.id || model.name} className="space-y-[5px]">
+                <div className="grid grid-cols-[minmax(0,1fr)_48px_30px] items-center gap-[6px] text-[11px] leading-[14px]">
+                  <div className="flex min-w-0 items-center gap-[6px] py-[1px]">
                   <span
                     className="h-[6px] w-[6px] rounded-full shrink-0"
                     style={{ background: color }}
                   />
-                  <span className="min-w-0 truncate font-semibold text-white/92 leading-[1.15]">
+                  <span className="min-w-0 truncate font-semibold text-white/92 leading-[14px]">
                     {middleEllipsis(model.name, 20)}
                   </span>
                   </div>
                   <span className="shrink-0 font-semibold text-white/84">
                     {formatCompact(model.tokens)}
                   </span>
-                  <span className="w-[30px] shrink-0 text-right text-[9px] font-medium text-white/58">
+                  <span className="w-[30px] shrink-0 text-right text-[10px] font-medium text-white/58">
                     {pct}%
                   </span>
                 </div>
-                <div className="ml-[12px] h-[3px] rounded-full bg-white/18">
+                <div className="ml-[12px] h-[4px] rounded-full bg-white/18">
                   <div
-                    className="h-[3px] rounded-full"
+                    className="h-[4px] rounded-full"
                     style={{
                       width: `${Math.max(2, Math.min(100, pct))}%`,
                       background: color,
@@ -471,15 +529,15 @@ function LimitsWidgetHost() {
 
   return (
     <WidgetShell appearanceOpacity={appearance.opacity}>
-      <div className="flex h-full flex-col justify-center px-[16px] py-[14px] text-white">
+      <div className="flex h-full flex-col justify-center px-[16px] py-[13px] text-white">
         {rows.length > 0 ? (
-          <div className="space-y-[9px]">
+          <div className="space-y-[8px]">
             {rows.map((row, index) => {
               const pct = Math.round(Number(row.pct || 0));
               const fill = limitBarFill(Math.max(0, Math.min(1, pct / 100)));
               return (
-                <div key={`${row.label}-${index}`} className="space-y-[4px]">
-                  <div className="flex items-center gap-[6px] text-[10px] leading-none">
+                <div key={`${row.label}-${index}`} className="space-y-[5px]">
+                  <div className="flex items-center gap-[6px] text-[11px] leading-[14px]">
                     <span
                       className="h-[6px] w-[6px] rounded-full shrink-0"
                       style={{ background: SOURCE_COLORS[row.source] || "#0A84FF" }}
@@ -487,16 +545,16 @@ function LimitsWidgetHost() {
                     <span className="min-w-0 flex-1 truncate font-semibold text-white/90">
                       {row.label}
                     </span>
-                    <span className="shrink-0 text-[9px] font-medium text-white/56">
+                    <span className="shrink-0 text-[10px] font-medium text-white/56">
                       {row.reset}
                     </span>
                     <span className="w-[30px] shrink-0 text-right font-semibold text-white/88">
                       {pct}%
                     </span>
                   </div>
-                  <div className="h-[3px] rounded-full bg-white/18">
+                  <div className="h-[4px] rounded-full bg-white/18">
                     <div
-                      className="h-[3px] rounded-full"
+                      className="h-[4px] rounded-full"
                       style={{
                         width: `${Math.max(2, pct)}%`,
                         background: fill,

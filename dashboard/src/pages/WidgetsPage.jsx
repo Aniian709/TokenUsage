@@ -610,6 +610,7 @@ function MenuBarDisplayCard({ overlayConfig, overlaySaving, onSaveOverlayConfig 
   const menuBarEnabled = Boolean(overlayConfig?.windows?.menubar?.enabled);
   const previewTodayTokens = 203_000_000;
   const [rangeDrafts, setRangeDrafts] = useState({});
+  const [animationExpanded, setAnimationExpanded] = useState(false);
   const previewClawdState = resolveMenuBarClawdState({
     todayTokens: previewTodayTokens,
     config: clawdConfig,
@@ -773,132 +774,156 @@ function MenuBarDisplayCard({ overlayConfig, overlaySaving, onSaveOverlayConfig 
 
       {animatedIcon ? (
         <div className="mt-5 rounded-xl border border-oai-gray-100 bg-oai-gray-50/70 p-4 dark:border-oai-gray-800 dark:bg-oai-gray-950/50">
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <button
+            type="button"
+            onClick={() => setAnimationExpanded((value) => !value)}
+            className="flex w-full items-center justify-between gap-4 text-left"
+            aria-expanded={animationExpanded}
+          >
             <div>
               <p className="text-sm font-medium text-oai-black dark:text-white">动画模式</p>
               <p className="mt-0.5 text-xs text-oai-gray-500 dark:text-oai-gray-400">
                 自动模式按原先的 todayTokens 分档触发；手动模式固定使用你选择的动画。
               </p>
             </div>
-            <SegmentedControl
-              options={[
-                { value: "auto", label: "自动", Icon: Sparkles },
-                { value: "manual", label: "手动", Icon: Wand2 },
-              ]}
-              value={clawdConfig.mode}
-              onChange={(mode) => saveClawdConfig({ ...clawdConfig, mode })}
-            />
-          </div>
+            <div className="flex shrink-0 items-center gap-2">
+              <span className="rounded-full bg-white px-2.5 py-1 text-xs font-semibold text-oai-gray-700 shadow-sm dark:bg-oai-gray-900 dark:text-oai-gray-200">
+                {clawdConfig.mode === "manual" ? "手动" : "自动"} · {formatClawdStateLabel(previewClawdState)}
+              </span>
+              <ChevronDown
+                className={cn(
+                  "h-4 w-4 text-oai-gray-500 transition-transform",
+                  animationExpanded && "rotate-180",
+                )}
+                aria-hidden="true"
+              />
+            </div>
+          </button>
 
-          {clawdConfig.mode === "manual" ? (
-            <div className="mt-4 space-y-4">
-              <ClawdStateSelect
-                label="手动动画"
-                hint="菜单栏会固定显示这个动画。"
-                value={clawdConfig.manualState}
-                disabled={overlaySaving || (!available && !overlayConfig)}
-                onChange={(manualState) => saveClawdConfig({ ...clawdConfig, manualState })}
-              />
-              <ClawdPreviewGrid
-                selectedState={clawdConfig.manualState}
-                onSelect={(manualState) => saveClawdConfig({ ...clawdConfig, manualState })}
-              />
-            </div>
-          ) : (
-            <div className="mt-4 space-y-4">
-              <div className="rounded-xl border border-oai-gray-200 bg-white p-3 dark:border-oai-gray-800 dark:bg-oai-gray-900">
-                <p className="text-xs font-semibold uppercase tracking-[0.08em] text-oai-gray-500 dark:text-oai-gray-400">
-                  自动模式当前预览
-                </p>
-                <p className="mt-1 text-sm font-medium text-oai-black dark:text-white">
-                  以 todayTokens = {previewTodayTokens.toLocaleString()} 预览，当前会触发 {formatClawdStateLabel(previewClawdState)}
-                </p>
+          {animationExpanded ? (
+            <>
+              <div className="mt-4 flex justify-end">
+                <SegmentedControl
+                  options={[
+                    { value: "auto", label: "自动", Icon: Sparkles },
+                    { value: "manual", label: "手动", Icon: Wand2 },
+                  ]}
+                  value={clawdConfig.mode}
+                  onChange={(mode) => saveClawdConfig({ ...clawdConfig, mode })}
+                />
               </div>
-              <div className="flex justify-end">
-                <button
-                  type="button"
-                  onClick={addAutoStage}
-                  className="inline-flex items-center gap-2 rounded-lg border border-oai-gray-200 bg-white px-3 py-2 text-sm font-medium text-oai-black transition-colors hover:border-oai-gray-300 dark:border-oai-gray-800 dark:bg-oai-gray-900 dark:text-white dark:hover:border-oai-gray-700"
-                >
-                  <Plus className="h-4 w-4" aria-hidden="true" />
-                  Add Stage
-                </button>
-              </div>
-              <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
-                {clawdConfig.autoStages.map((stage, index) => {
-                  const maxDraft = rangeDrafts[stage.id] ?? (Number.isFinite(stage.max) ? String(Number(stage.max) / 1_000_000) : "");
-                  return (
-                    <div
-                      key={stage.id}
-                      className="rounded-xl border border-oai-gray-200 bg-white p-3 dark:border-oai-gray-800 dark:bg-oai-gray-900"
+
+              {clawdConfig.mode === "manual" ? (
+                <div className="mt-4 space-y-4">
+                  <ClawdStateSelect
+                    label="手动动画"
+                    hint="菜单栏会固定显示这个动画。"
+                    value={clawdConfig.manualState}
+                    disabled={overlaySaving || (!available && !overlayConfig)}
+                    onChange={(manualState) => saveClawdConfig({ ...clawdConfig, manualState })}
+                  />
+                  <ClawdPreviewGrid
+                    selectedState={clawdConfig.manualState}
+                    onSelect={(manualState) => saveClawdConfig({ ...clawdConfig, manualState })}
+                  />
+                </div>
+              ) : (
+                <div className="mt-4 space-y-4">
+                  <div className="rounded-xl border border-oai-gray-200 bg-white p-3 dark:border-oai-gray-800 dark:bg-oai-gray-900">
+                    <p className="text-xs font-semibold uppercase tracking-[0.08em] text-oai-gray-500 dark:text-oai-gray-400">
+                      自动模式当前预览
+                    </p>
+                    <p className="mt-1 text-sm font-medium text-oai-black dark:text-white">
+                      以 todayTokens = {previewTodayTokens.toLocaleString()} 预览，当前会触发 {formatClawdStateLabel(previewClawdState)}
+                    </p>
+                  </div>
+                  <div className="flex justify-end">
+                    <button
+                      type="button"
+                      onClick={addAutoStage}
+                      className="inline-flex items-center gap-2 rounded-lg border border-oai-gray-200 bg-white px-3 py-2 text-sm font-medium text-oai-black transition-colors hover:border-oai-gray-300 dark:border-oai-gray-800 dark:bg-oai-gray-900 dark:text-white dark:hover:border-oai-gray-700"
                     >
-                      <div className="mb-3 flex items-start justify-between gap-3">
-                        <div>
-                          <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-oai-gray-500 dark:text-oai-gray-400">
-                            {`Stage ${index + 1}`}
-                          </p>
-                          <p className="mt-1 text-xs text-oai-gray-500 dark:text-oai-gray-400">
-                            todayTokens stage {index + 1}
-                          </p>
-                        </div>
-                        <button
-                          type="button"
-                          onClick={() => removeAutoStage(index)}
-                          disabled={clawdConfig.autoStages.length <= 2}
-                          className="inline-flex items-center gap-1 rounded-md border border-oai-gray-200 px-2 py-1 text-xs font-medium text-oai-gray-500 transition-colors hover:border-oai-gray-300 hover:text-oai-black disabled:cursor-not-allowed disabled:opacity-40 dark:border-oai-gray-800 dark:text-oai-gray-400 dark:hover:border-oai-gray-700 dark:hover:text-white"
+                      <Plus className="h-4 w-4" aria-hidden="true" />
+                      Add Stage
+                    </button>
+                  </div>
+                  <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
+                    {clawdConfig.autoStages.map((stage, index) => {
+                      const maxDraft = rangeDrafts[stage.id] ?? (Number.isFinite(stage.max) ? String(Number(stage.max) / 1_000_000) : "");
+                      return (
+                        <div
+                          key={stage.id}
+                          className="rounded-xl border border-oai-gray-200 bg-white p-3 dark:border-oai-gray-800 dark:bg-oai-gray-900"
                         >
-                          <Minus className="h-3.5 w-3.5" aria-hidden="true" />
-                          Remove
-                        </button>
-                      </div>
-                      <ClawdStateSelect
-                        label="Animation"
-                        value={stage.state}
-                        disabled={overlaySaving || (!available && !overlayConfig)}
-                        onChange={(value) =>
-                          saveClawdConfig({
-                            ...clawdConfig,
-                            autoStages: clawdConfig.autoStages.map((entry, entryIndex) =>
-                              entryIndex === index ? { ...entry, state: value } : entry,
-                            ),
-                          })}
-                      />
-                      <div className="mt-3 grid grid-cols-2 gap-3">
-                        <RangeDisplay
-                          label="Min"
-                          value={Number.isFinite(stage.min) ? Number(stage.min) / 1_000_000 : 0}
-                        />
-                        <RangeNumberInput
-                          label="Max"
-                          value={maxDraft}
-                          disabled={overlaySaving || (!available && !overlayConfig)}
-                          placeholder="留空表示无上限"
-                          onChange={(max) =>
-                            setRangeDrafts((prev) => ({
-                              ...prev,
-                              [stage.id]: max == null ? "" : String(max),
-                            }))}
-                          onBlur={() => {
-                            const raw = String(rangeDrafts[stage.id] ?? "").trim();
-                            saveAutoStageMax(index, raw === "" ? null : Number(raw));
-                          }}
-                          onKeyDown={(event) => {
-                            if (event.key === "Enter") {
-                              event.currentTarget.blur();
-                            }
-                          }}
-                        />
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-              <ClawdPreviewGrid
-                selectedState={previewClawdState}
-                interactive={false}
-              />
-            </div>
-          )}
+                          <div className="mb-3 flex items-start justify-between gap-3">
+                            <div>
+                              <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-oai-gray-500 dark:text-oai-gray-400">
+                                {`Stage ${index + 1}`}
+                              </p>
+                              <p className="mt-1 text-xs text-oai-gray-500 dark:text-oai-gray-400">
+                                todayTokens stage {index + 1}
+                              </p>
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => removeAutoStage(index)}
+                              disabled={clawdConfig.autoStages.length <= 2}
+                              className="inline-flex items-center gap-1 rounded-md border border-oai-gray-200 px-2 py-1 text-xs font-medium text-oai-gray-500 transition-colors hover:border-oai-gray-300 hover:text-oai-black disabled:cursor-not-allowed disabled:opacity-40 dark:border-oai-gray-800 dark:text-oai-gray-400 dark:hover:border-oai-gray-700 dark:hover:text-white"
+                            >
+                              <Minus className="h-3.5 w-3.5" aria-hidden="true" />
+                              Remove
+                            </button>
+                          </div>
+                          <ClawdStateSelect
+                            label="Animation"
+                            value={stage.state}
+                            disabled={overlaySaving || (!available && !overlayConfig)}
+                            onChange={(value) =>
+                              saveClawdConfig({
+                                ...clawdConfig,
+                                autoStages: clawdConfig.autoStages.map((entry, entryIndex) =>
+                                  entryIndex === index ? { ...entry, state: value } : entry,
+                                ),
+                              })}
+                          />
+                          <div className="mt-3 grid grid-cols-2 gap-3">
+                            <RangeDisplay
+                              label="Min"
+                              value={Number.isFinite(stage.min) ? Number(stage.min) / 1_000_000 : 0}
+                            />
+                            <RangeNumberInput
+                              label="Max"
+                              value={maxDraft}
+                              disabled={overlaySaving || (!available && !overlayConfig)}
+                              placeholder="留空表示无上限"
+                              onChange={(max) =>
+                                setRangeDrafts((prev) => ({
+                                  ...prev,
+                                  [stage.id]: max == null ? "" : String(max),
+                                }))}
+                              onBlur={() => {
+                                const raw = String(rangeDrafts[stage.id] ?? "").trim();
+                                saveAutoStageMax(index, raw === "" ? null : Number(raw));
+                              }}
+                              onKeyDown={(event) => {
+                                if (event.key === "Enter") {
+                                  event.currentTarget.blur();
+                                }
+                              }}
+                            />
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                  <ClawdPreviewGrid
+                    selectedState={previewClawdState}
+                    interactive={false}
+                  />
+                </div>
+              )}
+            </>
+          ) : null}
         </div>
       ) : null}
 
